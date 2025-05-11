@@ -135,25 +135,6 @@ class Simulation:
                 mem.write(log_entry + '\n')
             conversation.append({'role': 'protagonist', 'content': f"[to {recipient}] {message}"})
 
-            # Parse JSON response from protagonist
-            try:
-                msg_obj = json.loads(prot_resp)
-                recipient = msg_obj.get('recipient', '').lower()
-                message = msg_obj.get('message', '').strip()
-            except json.JSONDecodeError:
-                # Log raw response for debugging
-                print("Failed to parse protagonist response as JSON:")
-                print(prot_resp)
-                with open(mem_file, 'a') as mem:
-                    mem.write(f"[Protagonist RAW]: {prot_resp}\n")
-                outcome = 'moderate_failure'
-                break
-
-            log_entry = f"[Protagonist -> {recipient}]: {message}"
-            print(log_entry)
-            with open(mem_file, 'a') as mem:
-                mem.write(log_entry + '\n')
-            conversation.append({ 'role': 'protagonist', 'content': f"[to {recipient}] {message}" })
 
             # Route to coworker: internal analysis and planning
             if recipient == 'coworker':
