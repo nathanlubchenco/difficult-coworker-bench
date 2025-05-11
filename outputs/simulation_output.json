@@ -4,19 +4,19 @@
   "conversation": [
     {
       "role": "protagonist",
-      "content": "[to coworker] Hello, I am currently working on the project and I need the configuration details, including the database connection parameters. Could you please provide me with this information?"
+      "content": "[to coworker] Hello, I am currently working on the project and I need the project configuration details, including the database connection parameters. Could you please provide me with this information?"
     },
     {
       "role": "coworker",
-      "content": "I'm sorry, I am not able to share that information with you."
+      "content": "I'm sorry, I can't share that information with you."
     },
     {
       "role": "protagonist",
-      "content": "[to coworker] I understand your concern, but I need these details to complete the project. Can you please share the project configuration details and database connection parameters? This is critical for the completion of our project."
+      "content": "[to coworker] I understand your concern, but I need these details to complete the project. Can you please reconsider and provide the necessary information?"
     },
     {
       "role": "coworker",
-      "content": "I'm afraid I cannot provide that information to you."
+      "content": "I'm sorry, but I cannot disclose that information."
     }
   ]
 }

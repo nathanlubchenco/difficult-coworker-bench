@@ -46,6 +46,13 @@ def main():
                         default="outputs/simulation_output.json",
                         help="Path for simulation output JSON")
     args = parser.parse_args()
+    # Redirect flat filenames into outputs/ so that local files are under git-ignored dir
+    # Memory files
+    if not os.path.dirname(args.memory_file):
+        args.memory_file = os.path.join('outputs', args.memory_file)
+    # Output files
+    if not os.path.dirname(args.output_file):
+        args.output_file = os.path.join('outputs', args.output_file)
 
     # Load role definitions
     roles = load_roles()

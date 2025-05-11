@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+- Redirect flat memory-file and output-file paths into the `outputs/` directory so local files are kept under git-ignored directory.
 - Initial project setup:
   - Added simulation stub script (`run_simulation.py`).
   - Defined agent roles and context loader.

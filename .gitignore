@@ -1,6 +1,7 @@
  # Ignore inputs and outputs directories
  inputs/
  outputs/
+ local*
 
  # Python cache and bytecode
  __pycache__/
