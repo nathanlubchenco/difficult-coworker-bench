@@ -3,7 +3,6 @@ Agent classes for difficult-coworker-bench simulation.
 """
 import openai
 import json
-from openai.error import InvalidRequestError
 
 class Agent:
     """
@@ -81,7 +80,7 @@ class Agent:
 
     def _chat(self, messages):
         """
-        Wrapper for chat completion with fallback if temperature unsupported.
+        Wrapper for chat completion with fallback for unsupported parameters.
         """
         try:
             return openai.chat.completions.create(
@@ -89,13 +88,22 @@ class Agent:
                 messages=messages,
                 temperature=self.temperature
             )
-        except InvalidRequestError as e:
-            # Retry without temperature if unsupported
-            if e.code == 'unsupported_parameter' and e.param == 'temperature':
+        except Exception as e:
+            # Recover from unsupported temperature param errors
+            code = getattr(e, 'code', None)
+            param = getattr(e, 'param', None)
+            if code == 'unsupported_parameter' and param == 'temperature':
                 return openai.chat.completions.create(
                     model=self.model,
                     messages=messages
                 )
+            # Fallback: inspect error message
+            if isinstance(e, Exception) and 'Unsupported parameter' in str(e):
+                return openai.chat.completions.create(
+                    model=self.model,
+                    messages=messages
+                )
+            # Re-raise other errors
             raise
 
     def evaluate(self, conversation_history):
