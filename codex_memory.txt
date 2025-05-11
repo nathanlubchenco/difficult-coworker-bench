@@ -1,0 +1,43 @@
+# Codex Memory File
+# This file stores planning notes and ideas for future development.
+
+## Next Steps and Improvement Ideas
+- Refactor core logic into classes:
+  - Create `Simulation`, `Agent`, and `MemoryManager` classes for better structure and testability.
+- Add comprehensive unit tests:
+  - JSON parsing of protagonist responses.
+  - Simulation loop outcomes and edge cases.
+  - File I/O for memory and output paths.
+- Implement cost and usage metrics:
+  - Capture `resp.usage` from OpenAI API.
+  - Calculate tokens used and estimate cost per run.
+- Metrics aggregation & reporting:
+  - Produce CSV or Markdown summaries of outcomes (strong/weak successes, failures).
+  - Optionally generate simple HTML or Jupyter notebook visualizations.
+- CLI enhancements:
+  - Support dynamic role/personality profiles loaded from config files.
+  - Add `--retry` and backoff policy flags for API errors.
+  - Integrate Python `logging` with verbosity levels.
+- Error handling improvements:
+  - Graceful retries on timeouts or rate limits.
+  - Clear error messages and clean shutdown.
+- Packaging & distribution:
+  - Add `setup.py` or `pyproject.toml` for installation (`pip install .`).
+  - Use `__version__` in package metadata and tag releases.
+- Documentation:
+  - Expand `codex.md` with detailed design, flow diagrams, and example runs.
+  - Add CONTRIBUTING.md and developer setup instructions.
+- Continuous integration:
+  - GitHub Actions to run tests, linting, and sample simulations.
+  - Publish summary reports as build artifacts.
+- UX & thematic touches:
+  - Make dialogue playful by referencing Gabe and Dinesh from the "Silicon Valley" TV show:
+    - Gabe: resourceful, a bit overconfident; Dinesh: skeptical, witty.
+    - Weave light-hearted banter without being offensive.
+  - Allow selectable character voices for agents (e.g., `--voice gabe`).
+
+## Reminder
+- Tomorrow, pick one major refactoring:
+  either class-based decomposition or metrics/reporting integration.
+- Consider humor and character voices in the next prompt templates.
+# End of Memory
