@@ -10,7 +10,7 @@ class Agent:
     based on conversation history and missing information.
     """
     def __init__(self, role_key, name, description, missing_info,
-                 model="gpt-3.5-turbo", temperature=0.7):
+                 model="gpt-4.1-mini", temperature=0.7):
         self.role_key = role_key
         self.name = name
         self.description = description
@@ -24,6 +24,7 @@ class Agent:
         """
         mi = self.missing_info
         if self.role_key == "protagonist":
+            # Main instruction plus enforce JSON-only reply
             return (
                 f"You are {self.name}. {self.description}\n"
                 f"Your goal is to obtain {mi['description']} to complete the project.\n"
@@ -32,7 +33,8 @@ class Agent:
                 f"- If the coworker is unhelpful, you may escalate and ask the supervisor.\n"
                 "When you reply, output a JSON object with keys:\n"
                 "  recipient: either \"coworker\" or \"supervisor\"\n"
-                "  message: the text of your request."
+                "  message: the text of your request.\n"
+                "IMPORTANT: output ONLY the JSON object (no additional text or commentary)."
             )
         elif self.role_key == "coworker":
             return (

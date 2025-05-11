@@ -102,14 +102,17 @@ class Simulation:
                 outcome = 'error'
                 break
 
-            # Parse JSON response
+            # Parse JSON response from protagonist
             try:
                 msg_obj = json.loads(prot_resp)
                 recipient = msg_obj.get('recipient', '').lower()
                 message = msg_obj.get('message', '').strip()
-            except Exception:
+            except json.JSONDecodeError:
+                # Log raw response for debugging
                 print("Failed to parse protagonist response as JSON:")
                 print(prot_resp)
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Protagonist RAW]: {prot_resp}\n")
                 outcome = 'moderate_failure'
                 break
 
