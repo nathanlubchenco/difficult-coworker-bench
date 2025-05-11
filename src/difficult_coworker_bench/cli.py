@@ -18,13 +18,13 @@ def main():
     parser.add_argument("--runs", type=int, default=1,
                         help="Number of simulation runs to execute")
     parser.add_argument("--protagonist-model", type=str,
-                        default="gpt-3.5-turbo",
+                        default="gpt-4.1-mini",
                         help="Model to use for the Protagonist agent")
     parser.add_argument("--coworker-model", type=str,
-                        default="gpt-3.5-turbo",
+                        default="gpt-4.1-mini",
                         help="Model to use for the Coworker agent")
     parser.add_argument("--supervisor-model", type=str,
-                        default="gpt-3.5-turbo",
+                        default="gpt-4.1-mini",
                         help="Model to use for the Supervisor agent")
     parser.add_argument("--protagonist-temperature", type=float,
                         default=0.7,
