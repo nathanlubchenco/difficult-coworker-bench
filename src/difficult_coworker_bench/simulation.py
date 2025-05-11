@@ -209,8 +209,7 @@ class Simulation:
                 if recipient2 == 'coworker':
                     continue
                 elif recipient2 == 'protagonist':
-                    outcome = 'strong_success'
-                    break
+                    continue 
                 else:
                     print(f"Unknown supervisor recipient: '{recipient2}'")
                     outcome = 'moderate_failure'
