@@ -15,10 +15,14 @@
 - Updated `run_simulation.py` to use new `openai.chat.completions.create` interface (openai>=1.0.0).
 - Bumped `openai` requirement to `>=1.0.0,<2.0.0` in `requirements.txt` and removed legacy pin for <1.0.0.
 - Added CLI options (via `argparse`) for:
-- Refactored core simulation logic into classes:
-  - `Agent` in `src/difficult_coworker_bench/agent.py`
-  - `Simulation` and `load_roles` in `src/difficult_coworker_bench/simulation.py`
-  - Simplified `cli.py` to argument parsing and simulation runner invocation
+  - Refactored core simulation logic into classes:
+    - `Agent` in `src/difficult_coworker_bench/agent.py`
+    - `Simulation` and `load_roles` in `src/difficult_coworker_bench/simulation.py`
+    - Simplified `cli.py` to argument parsing and simulation runner invocation
+- Improved error handling and added internal evaluation & planning stages:
+  - Agents now perform `evaluate` (internal analysis) and `plan` before responding.
+  - Logged analysis steps to memory files for debugging.
+  - Enhanced JSON parsing error handling: logs raw LLM output under `[RAW]` entries.
   - `--runs` (number of simulation runs),
   - per-agent model overrides: `--protagonist-model`, `--coworker-model`, `--supervisor-model`,
   - per-agent temperature overrides: `--protagonist-temperature`, `--coworker-temperature`, `--supervisor-temperature`,

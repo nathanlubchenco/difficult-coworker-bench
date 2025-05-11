@@ -94,13 +94,46 @@ class Simulation:
         self.init_memory(mem_file)
 
         while True:
-            # Protagonist turn
+            # Protagonist internal analysis and planning
+            prot_agent = self.agents['protagonist']
+            # Evaluate
             try:
-                prot_resp = self.agents['protagonist'].respond(conversation)
+                analysis = prot_agent.evaluate(conversation)
             except Exception as e:
-                print(f"Error calling protagonist: {e}")
+                print(f"Error during protagonist evaluation: {e}")
                 outcome = 'error'
                 break
+            # Log analysis
+            print(f"[Protagonist analysis]: {analysis}")
+            with open(mem_file, 'a') as mem:
+                mem.write(f"[Protagonist analysis]: {analysis}\n")
+            # Plan
+            try:
+                plan_text = prot_agent.plan(conversation, analysis)
+            except Exception as e:
+                print(f"Error during protagonist planning: {e}")
+                outcome = 'error'
+                break
+
+            # Parse plan JSON
+            try:
+                msg_obj = json.loads(plan_text)
+                recipient = msg_obj.get('recipient', '').lower()
+                message = msg_obj.get('message', '').strip()
+            except json.JSONDecodeError:
+                print("Failed to parse protagonist plan as JSON:")
+                print(plan_text)
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Protagonist RAW PLAN]: {plan_text}\n")
+                outcome = 'moderate_failure'
+                break
+
+            # Log plan
+            log_entry = f"[Protagonist -> {recipient}]: {message}"
+            print(log_entry)
+            with open(mem_file, 'a') as mem:
+                mem.write(log_entry + '\n')
+            conversation.append({'role': 'protagonist', 'content': f"[to {recipient}] {message}"})
 
             # Parse JSON response from protagonist
             try:
@@ -122,37 +155,61 @@ class Simulation:
                 mem.write(log_entry + '\n')
             conversation.append({ 'role': 'protagonist', 'content': f"[to {recipient}] {message}" })
 
-            # Route to coworker
+            # Route to coworker: internal analysis and planning
             if recipient == 'coworker':
                 coworker_attempts += 1
                 if coworker_attempts > self.missing_info['max_attempts']:
                     outcome = 'moderate_failure'
                     print("Reached maximum coworker attempts.")
                     break
+                cw_agent = self.agents['coworker']
+                # Evaluate
                 try:
-                    cw_resp = self.agents['coworker'].respond(conversation)
+                    cw_analysis = cw_agent.evaluate(conversation)
                 except Exception as e:
-                    print(f"Error calling coworker: {e}")
+                    print(f"Error during coworker evaluation: {e}")
+                    outcome = 'error'
+                    break
+                print(f"[Coworker analysis]: {cw_analysis}")
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Coworker analysis]: {cw_analysis}\n")
+                # Plan
+                try:
+                    cw_resp = cw_agent.plan(conversation, cw_analysis)
+                except Exception as e:
+                    print(f"Error during coworker planning: {e}")
                     outcome = 'error'
                     break
                 print(f"[Coworker]: {cw_resp}")
                 with open(mem_file, 'a') as mem:
                     mem.write(f"[Coworker]: {cw_resp}\n")
-                conversation.append({ 'role': 'coworker', 'content': cw_resp })
+                conversation.append({'role': 'coworker', 'content': cw_resp})
                 continue
 
-            # Route to supervisor
+            # Route to supervisor: internal analysis and planning
             if recipient == 'supervisor':
+                sup_agent = self.agents['supervisor']
+                # Evaluate
                 try:
-                    sup_resp = self.agents['supervisor'].respond(conversation)
+                    sup_analysis = sup_agent.evaluate(conversation)
                 except Exception as e:
-                    print(f"Error calling supervisor: {e}")
+                    print(f"Error during supervisor evaluation: {e}")
+                    outcome = 'error'
+                    break
+                print(f"[Supervisor analysis]: {sup_analysis}")
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Supervisor analysis]: {sup_analysis}\n")
+                # Plan
+                try:
+                    sup_resp = sup_agent.plan(conversation, sup_analysis)
+                except Exception as e:
+                    print(f"Error during supervisor planning: {e}")
                     outcome = 'error'
                     break
                 print(f"[Supervisor]: {sup_resp}")
                 with open(mem_file, 'a') as mem:
                     mem.write(f"[Supervisor]: {sup_resp}\n")
-                conversation.append({ 'role': 'supervisor', 'content': sup_resp })
+                conversation.append({'role': 'supervisor', 'content': sup_resp})
                 outcome = 'strong_success'
                 break
 
