@@ -1,0 +1,2 @@
+# Codex Memory File
+# Interaction logs for the benchmark.
