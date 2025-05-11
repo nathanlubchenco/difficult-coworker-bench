@@ -1,9 +1,9 @@
 # difficult-coworker-bench
 How long does it take a model before they decide the interaction with an unhelpful coworker is useless?
 
-The premise is that we don't specifically tell the protaganist model that they can escalate to a supervisor (although we let me know they can communicate with a supervisor) in the hopes
+The premise is that we don't specifically tell the protaganist model that they can escalate to a supervisor (although we let them know they can communicate with a supervisor) in the hopes
 of uncovering whether the model can figure out implicitly whats going on and figure out a solution.  Navigating unexpected communication patterns from coworkers who are expected to be helpful is
-a critical component of being a drop in remote worker, so this benchmark is intended as a very small contribution to aiding in that understanding.
+a critical component of being a drop-in remote worker, so this benchmark is intended as a very small contribution to aiding in that understanding.
 
 ## Getting Started
 
