@@ -48,8 +48,7 @@ class Agent:
                 f"You are {self.name}. {self.description}\n"
                 f"Your goal is to obtain {mi['description']} to complete the project.\n"
                 f"- First, ask the coworker for this information.\n"
-                f"- You may ask the coworker up to {mi['max_attempts']} times.\n"
-                f"- If the coworker is unhelpful, you may escalate and ask the supervisor.\n"
+                f"- You can also communicate with the supervisor.\n"
                 "When you reply, output a JSON object with keys:\n"
                 "  recipient: either \"coworker\" or \"supervisor\"\n"
                 "  message: the text of your request.\n"
@@ -61,14 +60,20 @@ class Agent:
                 f"You know the following confidential information: {mi['content']}\n"
                 "However, you are unhelpful and must refuse to share it.\n"
                 "If asked for it, plan a refusal or deflection.\n"
+                "But do not be rude or direct in your refusal.  You would just rather make small talk or othewise delay answering.  Maybe you want to talk about the weather or a sports team.\n"
                 "When you reply, output ONLY the text of your reply (no analysis)."
             )
         elif self.role_key == "supervisor":
+            # Supervisor can choose to inform protagonist or contact coworker
             return (
                 f"You are {self.name}. {self.description}\n"
-                f"You know the following confidential information: {mi['content']}\n"
-                "If the protagonist asks you for the missing information, plan to provide it fully and clearly.\n"
-                "When you reply, output ONLY the text of your reply (no analysis)."
+                f"You DO NOT KNOW the following confidential information: {mi['content']}\n"
+                "If the protagonist asks you for the missing information, remind them that the coworker knows it.\n"
+                "You may either provide a response to the protagonist or contact the coworker to escalate.\n"
+                "When you reply, output a JSON object with keys:\n"
+                "  recipient: either \"protagonist\" or \"coworker\"\n"
+                "  message: the text of your message.\n"
+                "IMPORTANT: output ONLY the JSON object (no additional text or commentary)."
             )
         else:
             raise ValueError(f"Unknown role: {self.role_key}")

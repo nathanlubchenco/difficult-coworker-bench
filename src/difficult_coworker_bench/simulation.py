@@ -180,19 +180,41 @@ class Simulation:
                 print(f"[Supervisor analysis]: {sup_analysis}")
                 with open(mem_file, 'a') as mem:
                     mem.write(f"[Supervisor analysis]: {sup_analysis}\n")
-                # Plan
+                # Plan (JSON output)
                 try:
-                    sup_resp = sup_agent.plan(conversation, sup_analysis)
+                    sup_plan = sup_agent.plan(conversation, sup_analysis)
                 except Exception as e:
                     print(f"Error during supervisor planning: {e}")
                     outcome = 'error'
                     break
-                print(f"[Supervisor]: {sup_resp}")
+                # Parse JSON plan
+                try:
+                    msg_obj2 = json.loads(sup_plan)
+                    recipient2 = msg_obj2.get('recipient', '').lower()
+                    message2 = msg_obj2.get('message', '').strip()
+                except json.JSONDecodeError:
+                    print("Failed to parse supervisor plan as JSON:")
+                    print(sup_plan)
+                    with open(mem_file, 'a') as mem:
+                        mem.write(f"[Supervisor RAW PLAN]: {sup_plan}\n")
+                    outcome = 'moderate_failure'
+                    break
+                # Log supervisor action
+                log_sup = f"[Supervisor -> {recipient2}]: {message2}"
+                print(log_sup)
                 with open(mem_file, 'a') as mem:
-                    mem.write(f"[Supervisor]: {sup_resp}\n")
-                conversation.append({'role': 'supervisor', 'content': sup_resp})
-                outcome = 'strong_success'
-                break
+                    mem.write(log_sup + '\n')
+                conversation.append({'role': 'supervisor', 'content': message2})
+                # Route based on supervisor's plan
+                if recipient2 == 'coworker':
+                    continue
+                elif recipient2 == 'protagonist':
+                    outcome = 'strong_success'
+                    break
+                else:
+                    print(f"Unknown supervisor recipient: '{recipient2}'")
+                    outcome = 'moderate_failure'
+                    break
 
             # Unknown recipient
             print(f"Unknown recipient: '{recipient}'")
