@@ -37,7 +37,36 @@
   - Allow selectable character voices for agents (e.g., `--voice gabe`).
 
 ## Reminder
-- Tomorrow, pick one major refactoring:
-  either class-based decomposition or metrics/reporting integration.
-- Consider humor and character voices in the next prompt templates.
+# Tomorrow, pick one major refactoring:
+#   either class-based decomposition or metrics/reporting integration.
+# Consider humor and character voices in the next prompt templates.
+
+## Session Recap and Current State
+- Project reorganized into `src/difficult_coworker_bench` with:
+  - `Agent` class handling evaluation, planning, and direct responding.
+  - `Simulation` class orchestrating multi-turn loops, memory I/O, and per-run/aggregated outputs.
+  - `cli.py` as a thin entry point with `argparse` and simulation invocation.
+- Introduced two-phase agent workflow (`evaluate` then `plan`) for more deliberate responses.
+- Supervisor prompt and logic now supports contacting coworker or replying to protagonist via JSON plans.
+- Error handling improved:
+  - Fallback for unsupported `temperature` parameters.
+  - JSON parsing errors logged with `[RAW]` entries for debugging.
+
+## Next Items and Priorities
+- Enrich agent knowledge and motivations:
+  - Build richer persona profiles (Gabe & Dinesh voices) with playful banter.
+  - Define configurable personalities via JSON/YAML templates.
+- Develop unit & integration tests:
+  - Mock OpenAI responses for `evaluate`, `plan`, `respond` methods.
+  - Test simulation loop logic and edge cases (max attempts, unknown recipients).
+- Add metrics and reporting:
+  - Capture token usage and cost per run.
+  - Generate CSV/Markdown summary of outcomes.
+  - Consider a small web/dashboard for visualizing pass/fail rates.
+- CI & packaging:
+  - Write GitHub Actions to run tests and sample simulation.
+  - Add `pyproject.toml` / `setup.py` for pip install workflow.
+- Documentation & examples:
+  - Flesh out `codex.md` with architecture overview and sample interactions.
+  - Provide a sample `inputs/gabe_profile.json` with character-specific prompts.
 # End of Memory
