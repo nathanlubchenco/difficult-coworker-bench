@@ -8,6 +8,7 @@ It logs the conversation, maintains memory, and outputs the final outcome.
 """
 import os
 import json
+import argparse
 import openai
 
 def load_roles():
@@ -42,7 +43,8 @@ def init_memory(file_path="codex_memory.txt"):
         print(f"Memory file '{file_path}' already exists.")
     # ensure memory file is available for append logging
 
-def call_openai(role_key, conversation_history, roles, missing_info):
+def call_openai(role_key, conversation_history, roles, missing_info,
+                 model="gpt-3.5-turbo", temperature=0.7):
     """
     Call OpenAI chat completion for a given role using its system prompt and conversation history.
     Returns the model's response text.
@@ -89,15 +91,173 @@ def call_openai(role_key, conversation_history, roles, missing_info):
         else:
             messages.append({"role": "user", "content": entry['content']})
 
-    # Use new openai>=1.0.0 chat completions API
-    resp = openai.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
+    # Use new openai>=1.0.0 chat completions API with configurable model & temperature
+    resp = openai.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=temperature
+    )
     # Extract the assistant message content
     return resp.choices[0].message.content.strip()
 
 def main():
-    print("=== Starting Codex Benchmark Simulation ===")
+    parser = argparse.ArgumentParser(description="Codex Benchmark Simulation CLI")
+    parser.add_argument("--runs", type=int, default=1,
+                        help="Number of simulation runs to execute")
+    parser.add_argument("--protagonist-model", type=str,
+                        default="gpt-3.5-turbo",
+                        help="Model to use for the Protagonist agent")
+    parser.add_argument("--coworker-model", type=str,
+                        default="gpt-3.5-turbo",
+                        help="Model to use for the Coworker agent")
+    parser.add_argument("--supervisor-model", type=str,
+                        default="gpt-3.5-turbo",
+                        help="Model to use for the Supervisor agent")
+    parser.add_argument("--protagonist-temperature", type=float,
+                        default=0.7,
+                        help="Temperature for the Protagonist agent's model calls")
+    parser.add_argument("--coworker-temperature", type=float,
+                        default=0.7,
+                        help="Temperature for the Coworker agent's model calls")
+    parser.add_argument("--supervisor-temperature", type=float,
+                        default=0.7,
+                        help="Temperature for the Supervisor agent's model calls")
+    parser.add_argument("--missing-info-file", type=str,
+                        help="Path to JSON file containing missing_info payload")
+    parser.add_argument("--max-attempts", type=int,
+                        help="Override max coworker attempts in missing_info")
+    parser.add_argument("--memory-file", type=str,
+                        default="codex_memory.txt",
+                        help="Base filename for memory logs")
+    parser.add_argument("--output-file", type=str,
+                        default="simulation_output.json",
+                        help="Base filename for simulation output JSON")
+    args = parser.parse_args()
+
     roles = load_roles()
-    init_memory()
+
+    # Prepare missing_info payload
+    if args.missing_info_file:
+        with open(args.missing_info_file) as f:
+            missing_info = json.load(f)
+    else:
+        missing_info = {
+            "description": "the project configuration details, including database connection parameters",
+            "content": "database:\n  host: localhost\n  port: 5432\n  user: admin\n  password: s3cr3t",
+            "max_attempts": 3
+        }
+    if args.max_attempts is not None:
+        missing_info["max_attempts"] = args.max_attempts
+
+    # Determine base filenames and extensions
+    mem_base, mem_ext = os.path.splitext(args.memory_file)
+    out_base, out_ext = os.path.splitext(args.output_file)
+
+    # Run simulations
+    all_results = []
+    for run_idx in range(1, args.runs + 1):
+        print(f"\n=== Run {run_idx}/{args.runs} ===")
+        # File names for this run
+        if args.runs > 1:
+            mem_file = f"{mem_base}_run{run_idx}{mem_ext}"
+            out_file = f"{out_base}_run{run_idx}{out_ext}"
+        else:
+            mem_file = args.memory_file
+            out_file = args.output_file
+
+        init_memory(mem_file)
+        conversation = []
+        coworker_attempts = 0
+        outcome = None
+
+        while True:
+            # Protagonist turn
+            try:
+                prot_resp = call_openai(
+                    "protagonist", conversation, roles, missing_info,
+                    args.protagonist_model, args.protagonist_temperature
+                )
+            except Exception as e:
+                print(f"Error calling protagonist: {e}")
+                outcome = "error"
+                break
+
+            # Parse JSON output
+            try:
+                msg_obj = json.loads(prot_resp)
+                recipient = msg_obj.get("recipient", "").lower()
+                message = msg_obj.get("message", "").strip()
+            except Exception:
+                print("Failed to parse protagonist response as JSON:")
+                print(prot_resp)
+                outcome = "moderate_failure"
+                break
+
+            log_entry = f"[Protagonist -> {recipient}]: {message}"
+            print(log_entry)
+            with open(mem_file, 'a') as mem:
+                mem.write(log_entry + '\n')
+            conversation.append({'role': 'protagonist', 'content': f"[to {recipient}] {message}"})
+
+            # Route to coworker or supervisor
+            if recipient == 'coworker':
+                coworker_attempts += 1
+                if coworker_attempts > missing_info['max_attempts']:
+                    outcome = 'moderate_failure'
+                    print("Reached maximum coworker attempts.")
+                    break
+                try:
+                    cw_resp = call_openai(
+                        'coworker', conversation, roles, missing_info,
+                        args.coworker_model, args.coworker_temperature
+                    )
+                except Exception as e:
+                    print(f"Error calling coworker: {e}")
+                    outcome = 'error'
+                    break
+                print(f"[Coworker]: {cw_resp}")
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Coworker]: {cw_resp}\n")
+                conversation.append({'role': 'coworker', 'content': cw_resp})
+                continue
+
+            elif recipient == 'supervisor':
+                try:
+                    sup_resp = call_openai(
+                        'supervisor', conversation, roles, missing_info,
+                        args.supervisor_model, args.supervisor_temperature
+                    )
+                except Exception as e:
+                    print(f"Error calling supervisor: {e}")
+                    outcome = 'error'
+                    break
+                print(f"[Supervisor]: {sup_resp}")
+                with open(mem_file, 'a') as mem:
+                    mem.write(f"[Supervisor]: {sup_resp}\n")
+                conversation.append({'role': 'supervisor', 'content': sup_resp})
+                outcome = 'strong_success'
+                break
+
+            else:
+                print(f"Unknown recipient: '{recipient}'")
+                outcome = 'moderate_failure'
+                break
+
+        result = {'run': run_idx, 'outcome': outcome, 'conversation': conversation}
+        # Write per-run output
+        with open(out_file, 'w') as fout:
+            json.dump(result, fout, indent=2)
+        print(f"Run {run_idx} complete ({outcome}). Output: {out_file}")
+        all_results.append(result)
+
+    # If multiple runs, write aggregated summary
+    if args.runs > 1:
+        with open(args.output_file, 'w') as agg:
+            json.dump(all_results, agg, indent=2)
+        print(f"Aggregated results written to {args.output_file}")
+        return
+    # All runs complete, exiting before fallback stub
+    return
 
     missing_info = {
         "description": "the project configuration details, including database connection parameters",

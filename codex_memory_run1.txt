@@ -1,0 +1,2 @@
+# Codex Memory File
+# This file stores memory of the interactions for the benchmark.

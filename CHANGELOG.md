@@ -13,3 +13,12 @@
   - Logs conversation to `codex_memory.txt` and outputs final result to `simulation_output.json`.
 - Updated `run_simulation.py` to use new `openai.chat.completions.create` interface (openai>=1.0.0).
 - Bumped `openai` requirement to `>=1.0.0,<2.0.0` in `requirements.txt` and removed legacy pin for <1.0.0.
+- Added CLI options (via `argparse`) for:
+  - `--runs` (number of simulation runs),
+  - per-agent model overrides: `--protagonist-model`, `--coworker-model`, `--supervisor-model`,
+  - per-agent temperature overrides: `--protagonist-temperature`, `--coworker-temperature`, `--supervisor-temperature`,
+  - missing info configuration: `--missing-info-file`, `--max-attempts`,
+  - file naming: `--memory-file`, `--output-file`.
+- Multi-run support:
+  - Writes per-run memory (`<memory_file>_run<N>.txt`) and output (`<output_file>_run<N>.json`).
+  - Aggregates results into `<output_file>` when `--runs > 1`.
