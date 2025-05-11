@@ -138,8 +138,13 @@ def main():
 
     # Prepare missing_info payload
     if args.missing_info_file:
-        with open(args.missing_info_file) as f:
-            missing_info = json.load(f)
+        try:
+            with open(args.missing_info_file) as f:
+                missing_info = json.load(f)
+        except FileNotFoundError:
+            parser.error(f"Missing info file not found: {args.missing_info_file}")
+        except json.JSONDecodeError:
+            parser.error(f"Invalid JSON in missing info file: {args.missing_info_file}")
     else:
         missing_info = {
             "description": "the project configuration details, including database connection parameters",
