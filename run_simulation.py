@@ -89,8 +89,10 @@ def call_openai(role_key, conversation_history, roles, missing_info):
         else:
             messages.append({"role": "user", "content": entry['content']})
 
-    resp = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
-    return resp.choices[0].message['content'].strip()
+    # Use new openai>=1.0.0 chat completions API
+    resp = openai.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
+    # Extract the assistant message content
+    return resp.choices[0].message.content.strip()
 
 def main():
     print("=== Starting Codex Benchmark Simulation ===")
