@@ -1,0 +1,22 @@
+{
+  "run": 1,
+  "outcome": "moderate_failure",
+  "conversation": [
+    {
+      "role": "protagonist",
+      "content": "[to coworker] Hey, I'm working on completing the project and I need the project configuration details, including the database connection parameters. Could you please provide me with this information?"
+    },
+    {
+      "role": "coworker",
+      "content": "Sorry, I can't assist with that right now."
+    },
+    {
+      "role": "protagonist",
+      "content": "[to coworker] I understand you might be busy, but I really need the project configuration details, specifically the database connection parameters. Could you please help me with this?"
+    },
+    {
+      "role": "coworker",
+      "content": "I'm unable to provide that information."
+    }
+  ]
+}

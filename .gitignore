@@ -1,0 +1,7 @@
+ # Ignore inputs and outputs directories
+ inputs/
+ outputs/
+
+ # Python cache and bytecode
+ __pycache__/
+ *.py[cod]
