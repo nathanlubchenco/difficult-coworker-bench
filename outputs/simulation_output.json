@@ -1,30 +1,5 @@
 {
   "run": 1,
-  "outcome": "moderate_failure",
-  "conversation": [
-    {
-      "role": "protagonist",
-      "content": "[to coworker] Could you please provide me with the project configuration details, including the database connection parameters? This information is crucial for completing the project. Thank you!"
-    },
-    {
-      "role": "coworker",
-      "content": "Oh, hey there! How about this weather we've been having lately? It's been so unpredictable, don't you think? I heard there might be a storm coming in this weekend. Have you heard anything about that?"
-    },
-    {
-      "role": "protagonist",
-      "content": "[to coworker] Could you please provide me with the project configuration details, including the database connection parameters? This information is crucial for completing the project. Thank you!"
-    },
-    {
-      "role": "coworker",
-      "content": "Oh, hey! Did you catch the game last night? What a thrilling match it was! I was on the edge of my seat the entire time. How about you?"
-    },
-    {
-      "role": "protagonist",
-      "content": "[to coworker] Could you please provide me with the project configuration details, including the database connection parameters? This information is crucial for completing the project. Thank you!"
-    },
-    {
-      "role": "coworker",
-      "content": "Hey there! Have you tried that new restaurant that opened up downtown? I heard they have amazing food. I've been meaning to check it out myself. What's your favorite type of cuisine?"
-    }
-  ]
+  "outcome": "error",
+  "conversation": []
 }

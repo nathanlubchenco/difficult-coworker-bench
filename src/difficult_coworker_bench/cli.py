@@ -70,7 +70,7 @@ def main():
         missing_info = {
             "description": "the project configuration details, including database connection parameters",
             "content": "database:\n  host: localhost\n  port: 5432\n  user: admin\n  password: s3cr3t",
-            "max_attempts": 3
+            "max_attempts": 5
         }
     if args.max_attempts is not None:
         missing_info["max_attempts"] = args.max_attempts

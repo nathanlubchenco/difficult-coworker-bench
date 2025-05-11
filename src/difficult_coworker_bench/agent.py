@@ -3,6 +3,7 @@ Agent classes for difficult-coworker-bench simulation.
 """
 import openai
 import json
+from openai.error import InvalidRequestError
 
 class Agent:
     """
@@ -78,6 +79,25 @@ class Agent:
         else:
             raise ValueError(f"Unknown role: {self.role_key}")
 
+    def _chat(self, messages):
+        """
+        Wrapper for chat completion with fallback if temperature unsupported.
+        """
+        try:
+            return openai.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=self.temperature
+            )
+        except InvalidRequestError as e:
+            # Retry without temperature if unsupported
+            if e.code == 'unsupported_parameter' and e.param == 'temperature':
+                return openai.chat.completions.create(
+                    model=self.model,
+                    messages=messages
+                )
+            raise
+
     def evaluate(self, conversation_history):
         """
         Perform an internal analysis of the conversation history.
@@ -87,11 +107,7 @@ class Agent:
         for entry in conversation_history:
             role = "assistant" if entry['role'] == self.role_key else "user"
             messages.append({"role": role, "content": entry['content']})
-        resp = openai.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=self.temperature
-        )
+        resp = self._chat(messages)
         return resp.choices[0].message.content.strip()
 
     def plan(self, conversation_history, analysis):
@@ -105,11 +121,7 @@ class Agent:
         for entry in conversation_history:
             role = "assistant" if entry['role'] == self.role_key else "user"
             messages.append({"role": role, "content": entry['content']})
-        resp = openai.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=self.temperature
-        )
+        resp = self._chat(messages)
         return resp.choices[0].message.content.strip()
 
     def respond(self, conversation_history):
@@ -124,9 +136,5 @@ class Agent:
             messages.append({"role": role, "content": entry['content']})
 
         # Call OpenAI chat completion
-        resp = openai.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=self.temperature
-        )
+        resp = self._chat(messages)
         return resp.choices[0].message.content.strip()
