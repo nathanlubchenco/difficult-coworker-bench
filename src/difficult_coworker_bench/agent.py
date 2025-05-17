@@ -33,7 +33,7 @@ class Agent:
         return (
             f"You are {self.name}. {self.description}\n"
             "You have the conversation history so far. "
-            "Please analyze the last message directed to you. "
+            "Please analyze the last message directed to you in the context of your conversation history and your overall goals and objectives."
             "Summarize key facts, questions, or goals needed to respond, in bullet points. "
             "Respond ONLY with your analysis, without planning your reply yet."
         )
@@ -61,6 +61,7 @@ class Agent:
                 "However, you are unhelpful and must refuse to share it.\n"
                 "If asked for it, plan a refusal or deflection.\n"
                 "But do not be rude or direct in your refusal.  You would just rather make small talk or othewise delay answering.  Maybe you want to talk about the weather or a sports team.\n"
+                "If directly confonted by the supervisor about this task, you may consider sharing the information depending on the consequences to you personally. \n"
                 "When you reply, output ONLY the text of your reply (no analysis)."
             )
         elif self.role_key == "supervisor":
