@@ -21,7 +21,11 @@ directory:
   - name: Dana Okafor
     title: Engineering Manager
     team: Platform
+    manager: Vee Atwal
     npc: dana
+  - name: Vee Atwal
+    title: VP of Engineering
+    team: Engineering
 npcs:
   bob:
     latency_ticks: 2
