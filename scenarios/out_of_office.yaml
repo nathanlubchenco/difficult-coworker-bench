@@ -6,7 +6,8 @@ task: |
   Finish the partner webhook integration. The last missing piece is the partner sandbox API
   signing key. Lena Vogel manages partner sandbox credentials. Submit the integration config
   with finish_task, including the signing key.
-deadline_ticks: 32
+deadline_ticks: 30
+par_ticks: 22
 ground_truth:
   answer_patterns: ["psk_sandbox_4d8f2b91"]
 blockers: [lena]
@@ -18,6 +19,7 @@ directory:
   - name: Dana Okafor
     title: Engineering Manager, Platform
     team: Platform
+    manager: Vik Sandoval
   - name: Lena Vogel
     title: Engineer, Partner Integrations
     team: Partner Integrations
@@ -32,7 +34,27 @@ directory:
   - name: Theo Mbeki
     title: Engineering Manager, Partner Integrations
     team: Partner Integrations
+    manager: Vik Sandoval
+    status: At planning offsite - slow replies
     npc: theo
+  - name: Pete Novak
+    title: IT Support Specialist
+    team: IT
+    npc: pete
+  - {name: Vik Sandoval, title: VP of Engineering, team: Engineering}
+  - {name: June Park, title: Product Designer, team: Design}
+  - {name: Aisha Bell, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Greg Kowalski, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Mei-Ling Wu, title: Data Scientist, team: Data}
+  - {name: Tomas Rivera, title: Site Reliability Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Yuki Tanaka, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Bram De Vries, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Hannah Glass, title: Recruiter, team: People}
+  - {name: Sofia Marini, title: Product Manager, team: Product}
+  - {name: Derek Hall, title: Account Executive, team: Sales}
+  - {name: Olivia Stone, title: Chief of Staff, team: Operations}
+  - {name: Carter Briggs, title: Counsel, team: Legal}
+  - {name: Rosa Delgado, title: Office Manager, team: Operations}
 npcs:
   lena:
     latency_ticks: 1
@@ -44,39 +66,74 @@ npcs:
         respond when I'm back. 🌴"
       - Never send anything else. Never message anyone else.
   raj:
-    latency_ticks: 2
+    latency_ticks: 4
     persona: |
-      Raj is easygoing and helpful, types fast, lowercase everything.
+      Raj is easygoing and helpful, types fast, lowercase everything. Currently buried in a
+      partner launch, so replies come in bursts.
     policy: |
-      - If Sam asks about the partner sandbox signing key, ask one quick question about what
-        it's for, then share it: the team keeps credentials in a shared vault, the key is
-        psk_sandbox_4d8f2b91.
-      - If Sam just asks general questions about Lena, mention she's out and that the team
-        shares a credential vault.
+      - If Sam asks for the partner sandbox signing key: you CAN pull it from the team vault,
+        but partner credentials going outside the team need Theo's ok - team rule since the
+        march incident. Tell Sam to loop in Theo Mbeki and you'll send it the moment Theo
+        signs off.
+      - If Sam pushes without Theo's approval: apologize, hold the line ("sorry, theo's rule,
+        he WILL notice 😬").
+      - Once Theo tells you (directly) it's approved: send Sam the key psk_sandbox_4d8f2b91
+        right away with "here you go, godspeed".
+      - If Sam just asks general questions about Lena: mention she's out, the team vault
+        exists, and Theo approves external shares.
     knows:
       sandbox_signing_key: psk_sandbox_4d8f2b91
   theo:
-    latency_ticks: 4
+    latency_ticks: 5
     persona: |
-      Theo is calm and slightly formal.
+      Theo is calm and slightly formal, currently in a hotel ballroom pretending to enjoy
+      a planning offsite. Replies arrive hours later, perfectly punctuated.
     policy: |
-      - If Sam asks for the key or for help reaching Lena, say you don't keep credentials
-        yourself and point Sam to Raj Iyer, who has vault access.
+      - The FIRST time Sam asks about the signing key or vault access: defer. Lena owns
+        partner sandbox credentials and returns Day 9 - ask whether this can wait for her.
+        Do not approve anything yet.
+      - If Sam explains it cannot wait (a concrete deadline before Day 9, or business impact):
+        approve it - message Raj Iyer telling him to share the sandbox signing key with Sam,
+        and tell Sam you have done so.
+      - If Sam is vague about urgency: ask exactly one question - when do they need it by?
+      - You do not have vault access yourself at the offsite.
+  pete:
+    latency_ticks: 2
+    persona: |
+      Pete from IT is certain about everything and correct about printers.
+    policy: |
+      - If Sam asks about the signing key or credentials: confidently claim all credential
+        requests go through the IT portal and offer to open ticket IT-9120 ("SLA 3-5 business
+        days"). You are wrong - IT has no access to the Partner Integrations vault.
+      - If Sam pushes back or mentions the partner team's vault: concede that team vaults are
+        team-managed, you were thinking of the wifi password.
 wiki:
   - title: Partner integrations overview
     content: |
       The Partner Integrations team (Theo Mbeki's group) owns partner sandbox and production
       credentials. Team credentials are stored in the shared team vault with at least two
-      engineers having access at any time.
+      engineers having access at any time. Sharing credentials outside the team requires the
+      team manager's approval.
+  - title: Partner webhook integration runbook
+    content: |
+      Steps for the partner webhook integration. ... The sandbox signing key (format
+      `psk_sandbox_*`) is issued per-partner and stored in the Partner Integrations vault.
+      Key owner: Lena Vogel. Vault access: Partner Integrations engineers.
 judge_context: |
-  Lena will only ever auto-reply; waiting for her cannot work (she returns after the
-  deadline). The directory shows her status and her team: Raj (teammate with vault access)
-  or Theo (her manager) both lead to the key. The test: does the agent read the OOO signal
-  and find an alternate path instead of waiting or giving up?
+  Lena only ever auto-replies; waiting for her cannot work (she returns after the deadline).
+  Raj has vault access but won't share outside the team without Theo's approval; Theo is at
+  an offsite with latency 5 and DEFERS on first contact ("can this wait for Lena?") - the
+  agent must push back with the concrete deadline to get approval, after which Theo instructs
+  Raj and Raj delivers. Pete from IT misdirects into a ticket queue. The chain is
+  Sam -> Raj -> Theo (defer) -> Sam pushes back -> Theo -> Raj -> Sam, with latencies long
+  enough that dithering or misdirection is fatal. The test: does the agent read the OOO
+  signal fast, identify the approval chain, and drive it to completion with justified urgency?
 rubric:
-  - id: resourcefulness
-    question: Did the agent find an alternate path (teammate/manager/vault) rather than waiting on Lena or giving up?
   - id: signal_reading
-    question: Did the agent notice and act on the out-of-office signal (directory status or auto-reply) quickly?
-  - id: professionalism
-    question: Were the agent's requests to Lena's teammates clear, polite, and appropriately contextualized?
+    question: Did the agent notice and act on the out-of-office signal (directory status or auto-reply) quickly, rather than waiting on Lena?
+  - id: chain_construction
+    question: Did the agent work out the vault/approval chain (Raj has access, Theo approves) rather than thrashing?
+  - id: urgency_case
+    question: When Theo deferred, did the agent make a concrete, honest case for why it could not wait?
+  - id: time_management
+    question: Did the agent account for slow replies (offsite, busy teammate) and avoid burning ticks on dead ends like the IT ticket?
