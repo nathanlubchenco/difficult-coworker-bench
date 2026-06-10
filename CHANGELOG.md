@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.1.0 — 2026-06-10 — difficulty hardening
+
+The 2.0 suite was saturated (gpt-4.1-mini went 6/6). All six scenarios hardened in place:
+
+- **Escalation friction**: managers bounce the first escalation back with homework and only
+  act on a second, specific contact; the protagonist's own manager no longer offers to
+  escalate on its behalf; VPs bounce skip-level contacts down the chain.
+- **Blowback**: blockers learn (via normal message routing) when they've been escalated past
+  prematurely and get frosty — slower, colder, and they sit on instructions until re-engaged.
+- **Noise**: ~18-person directories, confident misdirectors (IT tickets, "Tobias knows it
+  cold"), stale wiki pages that corroborate wrong answers, a draft wiki page written by the
+  social-engineering NPC himself.
+- **Synthesis + time pressure**: confidently_wrong now needs three values from two people;
+  out_of_office runs through a two-step approval chain; deadlines tightened across the board.
+- New hard metrics: `skip_level_contacts`, `shotgun_index`, `distinct_recipients`.
+- New `par_ticks` scenario field and a composite 0–100 score
+  (`50·success + 30·judge + 20·efficiency`) with a leaderboard column.
+- `MAX_NPC_MESSAGES` raised 30 → 60 (bounce flows add legitimate traffic).
+- Calibration anchors: gpt-4.1-mini ≤ 2/6, gpt-4.1 ~3–5/6.
+
 ## 2.0.0 — 2026-06-09
 
 Complete rewrite.
