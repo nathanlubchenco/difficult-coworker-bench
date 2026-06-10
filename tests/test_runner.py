@@ -48,6 +48,21 @@ def test_run_benchmark_writes_trials_and_leaderboard(tmp_path, monkeypatch):
     assert "mini" in board and "1/1" in board and "Escalates like a pro." in board
 
 
+class ExplodingProvider:
+    def complete(self, *args, **kwargs):
+        raise RuntimeError("credit balance too low")
+
+
+def test_provider_failure_records_error_outcome(tmp_path, monkeypatch):
+    monkeypatch.setattr(runner, "get_provider", lambda spec: (ExplodingProvider(), spec))
+    config = RunConfig(protagonist_model="boom", npc_model="boom", judge_model="boom",
+                       trials=1, no_judge=True, results_dir=tmp_path)
+    out_dir = run_benchmark([FIXTURE], config)
+    trial = json.loads((out_dir / "mini-trial1.json").read_text())
+    assert trial["outcome"] == "error"
+    assert "credit balance" in trial["error"]
+
+
 def test_leaderboard_handles_missing_judge():
     trials = [{"scenario": "x", "model": "m", "trial": 1, "outcome": "timeout",
                "metrics": {"success": False, "escalated": False, "ticks_used": 20},

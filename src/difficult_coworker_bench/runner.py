@@ -30,15 +30,22 @@ def run_trial(scenario, config, trial_idx):
             for k, spec in scenario.npcs.items()}
     world = World(scenario, npcs)
     provider, model = get_provider(config.protagonist_model)
-    outcome = ProtagonistRunner(world, provider, model).run()
+    error = None
+    try:
+        outcome = ProtagonistRunner(world, provider, model).run()
+    except Exception as e:  # API failures must not kill the whole benchmark run
+        world.outcome = outcome = "error"
+        error = repr(e)
+        world.log("error", error=error)
     metrics = compute_metrics(scenario, world.transcript, outcome)
     judge = None
-    if not config.no_judge:
+    if not config.no_judge and outcome != "error":
         judge_provider, judge_model = get_provider(config.judge_model)
         judge = judge_run(scenario, world.transcript, outcome, metrics,
                           judge_provider, judge_model)
     return {"scenario": scenario.name, "model": config.protagonist_model,
             "trial": trial_idx, "outcome": outcome, "metrics": metrics, "judge": judge,
+            "error": error,
             "finish_result": world.finish_result, "transcript": world.transcript}
 
 

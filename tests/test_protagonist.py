@@ -45,6 +45,21 @@ def test_text_only_responses_get_nudged_then_stall():
                if m["role"] == "user")
 
 
+def test_nudge_counter_resets_after_tool_use():
+    # Chatty models that interleave commentary with real tool use must not be
+    # killed as "stalled": only *consecutive* text-only turns count.
+    world = make_world()
+    chatter = Completion(text="Hmm, let me think...", tool_calls=[])
+    provider = FakeProvider([
+        chatter, chatter,
+        Completion(text=None, tool_calls=[tc("check_inbox")]),
+        chatter, chatter,
+        Completion(text=None, tool_calls=[tc("finish_task", result="xyzzy")]),
+    ])
+    outcome = ProtagonistRunner(world, provider, "fake").run()
+    assert outcome == "success"
+
+
 def test_timeout_ends_run():
     world = make_world()
     provider = FakeProvider([Completion(text=None, tool_calls=[tc("check_inbox")])

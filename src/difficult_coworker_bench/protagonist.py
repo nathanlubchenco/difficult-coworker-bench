@@ -48,6 +48,7 @@ class ProtagonistRunner:
                 self.messages.append({"role": "user",
                                       "content": "(Use one of your tools to act.)"})
                 continue
+            nudges = 0  # only consecutive text-only turns count as stalling
             for call in completion.tool_calls:
                 result = self.world.handle_tool(call.name, call.arguments)
                 self.messages.append({"role": "tool", "tool_call_id": call.id,
