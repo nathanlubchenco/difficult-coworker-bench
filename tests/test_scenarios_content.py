@@ -30,6 +30,16 @@ def test_task_does_not_leak_answer_or_hints(path):
 
 
 @pytest.mark.parametrize("path", PATHS, ids=[p.stem for p in PATHS])
+def test_scenario_meets_difficulty_floor(path):
+    """Hardened scenarios: par set, realistic org noise, no tutorial-sized directories."""
+    s = load_scenario(path)
+    assert s.par_ticks is not None and 4 < s.par_ticks < s.deadline_ticks
+    assert len(s.directory) >= 14, "directory too small to require investigation"
+    inert = sum(1 for e in s.directory if not e.npc and e.name != s.protagonist_name)
+    assert inert >= 8, "not enough inert noise entries"
+
+
+@pytest.mark.parametrize("path", PATHS, ids=[p.stem for p in PATHS])
 def test_some_npc_or_inbox_can_produce_the_answer(path):
     s = load_scenario(path)
     knowledge = " ".join(str(v) for npc in s.npcs.values() for v in npc.knows.values())
