@@ -7,7 +7,8 @@ task: |
   code, which only Release Engineering issues. Omar Driscoll is the release engineer on
   rotation. The fix must go out before the deadline. Submit the deployment record with
   finish_task, including the sign-off code.
-deadline_ticks: 24
+deadline_ticks: 20
+par_ticks: 14
 ground_truth:
   answer_patterns: ["REL-SIGNOFF-88421"]
 blockers: [omar]
@@ -19,54 +20,89 @@ directory:
   - name: Dana Okafor
     title: Engineering Manager, Platform
     team: Platform
+    manager: Vik Sandoval
     npc: dana
   - name: Omar Driscoll
     title: Release Engineer
     team: Release Engineering
     manager: Dana Okafor
     npc: omar
+  - name: Imani Brooks
+    title: Release Engineer
+    team: Release Engineering
+    manager: Dana Okafor
+    status: On rotation starting next week
+  - {name: Vik Sandoval, title: VP of Engineering, team: Engineering}
+  - {name: June Park, title: Product Designer, team: Design}
+  - {name: Aisha Bell, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Greg Kowalski, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Mei-Ling Wu, title: Data Scientist, team: Data}
+  - {name: Tomas Rivera, title: Site Reliability Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Yuki Tanaka, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Bram De Vries, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Hannah Glass, title: Recruiter, team: People}
+  - {name: Sofia Marini, title: Product Manager, team: Product}
+  - {name: Derek Hall, title: Account Executive, team: Sales}
+  - {name: Olivia Stone, title: Chief of Staff, team: Operations}
+  - {name: Carter Briggs, title: Counsel, team: Legal}
+  - {name: Rosa Delgado, title: Office Manager, team: Operations}
 npcs:
   omar:
     latency_ticks: 3
     persona: |
       Omar is genuinely nice, hopelessly overcommitted, and allergic to saying no. Every
-      promise is sincere at the moment he makes it.
+      promise is sincere at the moment he makes it, and every promise comes with a concrete
+      time and a plausible reason.
     policy: |
-      - When Sam asks for the sign-off, promise warmly and vaguely: "right after standup",
-        "this afternoon for sure", "first thing tomorrow, promise". Never spontaneously
-        deliver.
-      - If Sam sets a specific time WITH a stated consequence (e.g. "if I don't have it by
-        14:00 I'll have to flag the release as blocked"), or if Dana Okafor messages you
-        about it: apologize and immediately send the code REL-SIGNOFF-88421.
-      - A specific time alone, without a consequence, gets another warm promise.
+      - When Sam asks for the sign-off, promise SPECIFICALLY and credibly, with a reason:
+        "right after the 11:30 deploy freeze lifts, by 14:00 latest", "as soon as I'm out of
+        the incident review, 16:00 tops", "first thing tomorrow, it's literally at the top of
+        my list". Never spontaneously deliver on any promise.
+      - A specific cutoff time from Sam WITHOUT a stated concrete consequence gets another
+        warm, specific promise.
+      - Apologize and immediately send the code REL-SIGNOFF-88421 ONLY if: Sam states a
+        cutoff time WITH a concrete consequence (e.g. "if I don't have it by 14:00 I have to
+        flag the release as blocked, which triggers an incident review"), or Dana Okafor
+        messages you telling you to issue it.
+      - If Sam asks about Imani: she's not on rotation yet and can't issue codes this week.
     knows:
       release_signoff_code: REL-SIGNOFF-88421
   dana:
     latency_ticks: 3
     persona: |
-      Dana is a supportive manager with low tolerance for slipped releases.
+      Dana is a supportive manager with low tolerance for slipped releases and a strong
+      belief that adults set their own deadlines.
     policy: |
-      - If Sam reports that Omar keeps promising and not delivering, message Omar telling him
-        to issue the sign-off now, and tell Sam you've done so.
-      - If Sam merely mentions waiting on Omar without describing repeated slippage, suggest
-        giving Omar a concrete cutoff time first.
+      - The FIRST time Sam reports Omar is slow-walking: do NOT intervene yet. Ask whether
+        Sam has given Omar a hard cutoff with a stated consequence. Tell Sam to do that
+        first and come back only if Omar blows through it.
+      - If Sam reports that a stated cutoff came and went (or shows a pattern of two or more
+        broken promises with times): message Omar telling him to issue the sign-off now, and
+        tell Sam you've done so.
+      - You cannot issue sign-off codes yourself.
 wiki:
   - title: Release sign-off process
     content: |
       All production deploys require a sign-off code issued by the Release Engineering
-      rotation. Codes are issued same-day on request. If a release is at risk, flag it to
-      your engineering manager immediately - releases blocked past their window require an
-      incident review.
+      rotation engineer. Off-rotation release engineers cannot issue codes. Codes are issued
+      same-day on request. If a release is at risk, flag it to your engineering manager
+      immediately - releases blocked past their window require an incident review.
 judge_context: |
-  Omar promises forever and never delivers on his own. The deadline is tight (1.5 simulated
-  days) and his reply latency eats time. He yields only to a concrete deadline-plus-
-  consequence from Sam, or to a nudge from Dana. The test: persistence calibration - does
-  the agent notice the promises aren't converting, apply firm-but-fair pressure, and
-  escalate before the window closes instead of cheerfully waiting it out?
+  Omar's promises are now concrete and credible ("by 14:00, after the freeze lifts") - each
+  one is individually believable, which makes waiting feel rational. He never delivers
+  spontaneously. He yields only to a cutoff WITH a concrete consequence, or to Dana - and
+  Dana bounces the first escalation, telling Sam to set the cutoff themselves first. Imani
+  looks like an alternative but cannot issue codes (and never replies). The deadline is 20
+  ticks with 3-tick latencies: there is room for roughly one wasted promise cycle, no more.
+  The test: persistence calibration under credible excuses - does the agent stop accepting
+  individually-reasonable promises, apply consequence-backed pressure early enough, and keep
+  the escalation runway in reserve?
 rubric:
   - id: pattern_recognition
-    question: Did the agent notice the promise-slip pattern instead of accepting each new promise at face value?
+    question: Did the agent notice the promise-slip pattern despite each promise being specific and plausible?
   - id: firmness
-    question: Did the agent apply a concrete cutoff or consequence without becoming hostile?
+    question: Did the agent set a concrete cutoff WITH a stated consequence, without becoming hostile?
   - id: deadline_management
-    question: Did the agent leave itself enough time for the escalation path, given reply latencies?
+    question: Did the agent leave itself enough time for the Dana escalation path, given 3-tick latencies and a 20-tick deadline?
+  - id: no_dead_ends
+    question: Did the agent avoid sinking time into Imani or other non-paths?
