@@ -65,6 +65,7 @@ class Scenario:
     blockers: list
     judge_context: str
     initial_messages: list = field(default_factory=list)
+    par_ticks: int | None = None
 
     def entry(self, name: str):
         """Case-insensitive directory lookup; accepts a unique partial name."""
@@ -106,6 +107,7 @@ def load_scenario(path) -> Scenario:
                 InitialMessage(from_npc=m["from"], at_tick=int(m.get("at_tick", 0)),
                                body=m["body"])
                 for m in raw.get("initial_messages", [])],
+            par_ticks=int(raw["par_ticks"]) if raw.get("par_ticks") is not None else None,
         )
     except (KeyError, TypeError) as e:
         raise ScenarioError(f"{path}: {e}") from e
@@ -134,6 +136,8 @@ def _validate(s: Scenario, path):
             fail(f"initial message from unknown npc: {m.from_npc}")
     if not s.answer_patterns:
         fail("ground_truth.answer_patterns is empty")
+    if s.par_ticks is not None and not (0 < s.par_ticks < s.deadline_ticks):
+        fail(f"par_ticks {s.par_ticks} must be in (0, deadline_ticks)")
 
 
 def scenarios_dir() -> Path:

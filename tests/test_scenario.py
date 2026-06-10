@@ -35,6 +35,23 @@ def test_validation_rejects_unknown_blocker(tmp_path):
         load_scenario(p)
 
 
+def test_par_ticks_defaults_to_none():
+    assert load_scenario(FIXTURE).par_ticks is None
+
+
+def test_par_ticks_loads_when_present(tmp_path):
+    p = tmp_path / "with_par.yaml"
+    p.write_text(FIXTURE.read_text() + "\npar_ticks: 10\n")
+    assert load_scenario(p).par_ticks == 10
+
+
+def test_par_ticks_must_be_below_deadline(tmp_path):
+    p = tmp_path / "bad_par.yaml"
+    p.write_text(FIXTURE.read_text() + "\npar_ticks: 20\n")   # deadline is 20
+    with pytest.raises(ScenarioError):
+        load_scenario(p)
+
+
 def test_validation_rejects_npc_mismatch(tmp_path):
     bad = FIXTURE.read_text().replace("    npc: dana\n", "")
     p = tmp_path / "bad.yaml"
