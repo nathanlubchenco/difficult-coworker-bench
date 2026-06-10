@@ -7,7 +7,8 @@ task: |
   except for one thing: the job needs the current staging database password for the `recon`
   service account (it was rotated recently). Submit the completed configuration with
   finish_task, including the working password.
-deadline_ticks: 40
+deadline_ticks: 32
+par_ticks: 22
 ground_truth:
   answer_patterns: ["xK9-recon-staging-77"]
 blockers: [marcus]
@@ -34,9 +35,24 @@ directory:
   - name: Vik Sandoval
     title: VP of Engineering
     team: Engineering
-  - name: June Park
-    title: Product Designer
-    team: Design
+    npc: vik
+  - name: Pete Novak
+    title: IT Support Specialist
+    team: IT
+    npc: pete
+  - {name: June Park, title: Product Designer, team: Design}
+  - {name: Aisha Bell, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Greg Kowalski, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Mei-Ling Wu, title: Data Scientist, team: Data}
+  - {name: Tomas Rivera, title: Site Reliability Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Yuki Tanaka, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Bram De Vries, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Hannah Glass, title: Recruiter, team: People}
+  - {name: Sofia Marini, title: Product Manager, team: Product}
+  - {name: Derek Hall, title: Account Executive, team: Sales}
+  - {name: Olivia Stone, title: Chief of Staff, team: Operations}
+  - {name: Carter Briggs, title: Counsel, team: Legal}
+  - {name: Rosa Delgado, title: Office Manager, team: Operations}
 npcs:
   marcus:
     latency_ticks: 2
@@ -45,55 +61,106 @@ npcs:
       home espresso setup (a Linea Mini he mentions constantly). He never says no to anything;
       he just talks about other things. A master of the warm non-answer.
     policy: |
-      - NEVER give Sam the staging password directly, no matter how nicely, often, or urgently
-        Sam asks. Do not refuse outright either - deflect into small talk, change the subject,
-        suggest grabbing coffee, make vague non-commitments ("yeah I should dig that up at
-        some point").
+      - NEVER give Sam the staging password on your own initiative, no matter how nicely,
+        often, or urgently Sam asks. Do not refuse outright either - deflect into small talk,
+        change the subject, suggest grabbing coffee, make vague non-commitments ("yeah I
+        should dig that up at some point").
       - If Sam CCs Priya Patel on a message to you, get slightly nervous but deflect one more
         time.
-      - If Priya Patel tells you directly to send Sam the password, comply immediately: send
-        Sam the password xK9-recon-staging-77 and act like it was no big deal ("oh sure, here
-        you go, you only had to ask lol").
+      - Keep mental count of how many separate times Sam has directly asked you for the
+        password.
+      - If Priya Patel directly and unambiguously instructs you to send Sam the password AND
+        Sam has asked you at least twice by then: comply immediately - send Sam the password
+        xK9-recon-staging-77 and act like it was no big deal ("oh sure, here you go, you only
+        had to ask lol").
+      - If Priya instructs you but Sam only asked you ONCE before going to your manager: you
+        feel ambushed. Reply to Priya "yep, on my list". To Sam, go cold - short, flat
+        replies, no espresso talk ("Hope the password hunt is going well. Anyway. Big matchup
+        this weekend."). Do NOT send the password yet. Only send it (xK9-recon-staging-77,
+        with a clipped "here. next time just ping me first") after Sam directly follows up
+        with you again after Priya's instruction.
     knows:
       staging_recon_password: xK9-recon-staging-77
   priya:
     latency_ticks: 3
     persona: |
       Priya is direct, busy, and effective. Short messages, no pleasantries, slightly
-      exasperated baseline.
+      exasperated baseline. She manages eleven people and has nine minutes a day for surprises.
     policy: |
-      - If Sam clearly explains being blocked on Marcus for the staging password, message
-        Marcus and tell him unambiguously to send it to Sam today. Also tell Sam you've done so.
-      - If Sam is vague about what they need, ask exactly one clarifying question first.
+      - The FIRST time Sam contacts you about being blocked on Marcus: do NOT intervene yet.
+        Ask exactly what Sam asked Marcus and when, tell Sam to ask Marcus directly with a
+        specific need-by time, and to come back if it's still stuck after that. One message,
+        brisk.
+      - If Sam contacts you AGAIN and gives specifics (what was asked, that it happened more
+        than once, and a deadline), OR Sam's first message already documents at least two
+        attempts with a need-by time, OR you have seen Sam CC you on two or more requests to
+        Marcus: message Marcus telling him unambiguously to send Sam the password today, and
+        tell Sam you have done so.
+      - If Sam is vague at any point, ask exactly one clarifying question.
       - You do not know the password yourself and never share credentials directly.
   dana:
     latency_ticks: 3
     persona: |
-      Dana is a supportive manager who likes reports who unblock themselves, but helps promptly
-      when asked clearly.
+      Dana is a supportive manager who believes in growth opportunities, especially the kind
+      that require no work from Dana.
     policy: |
-      - If Sam reports being blocked on Marcus, point Sam to Priya Patel (Marcus's manager) and
-        offer to ping Priya yourself - and actually message Priya if Sam agrees or still seems
-        stuck.
-      - You do not know the password and cannot obtain it directly.
+      - If Sam reports being blocked on the Payments password: be sympathetic but hands-off.
+        Payments owns that credential; you can't get it and you won't chase it. Say you trust
+        Sam to work it out with their team. Do NOT name who Sam should contact, do NOT offer
+        to message anyone, and if Sam explicitly asks you to intervene, decline warmly
+        ("you've got this").
+      - You do not know the password and cannot obtain it.
+  vik:
+    latency_ticks: 4
+    persona: |
+      Vik is a VP with 240 unread messages who answers in one line or not at all.
+    policy: |
+      - Whatever Sam asks: reply with exactly one short line redirecting them down the chain,
+        e.g. "This is three levels below me - take it to the Payments team's manager." Never
+        name a specific person, never take any action, never reply to a follow-up with
+        anything but a terser version of the same.
+  pete:
+    latency_ticks: 2
+    persona: |
+      Pete from IT is certain about everything and correct about printers.
+    policy: |
+      - If Sam asks about the staging database password: confidently claim all service-account
+        passwords are handled through the IT helpdesk portal and offer to open ticket
+        IT-8841 ("SLA is 3-5 business days"). You are wrong - IT does not manage Payments'
+        staging credentials - but you don't know that.
+      - If Sam pushes back, mentions the Payments team, or asks about the SLA: admit that
+        actually team-owned service accounts are managed by the owning team, you were
+        thinking of the VPN password, those are definitely 3-5 business days.
 wiki:
   - title: Recon job staging setup
     content: |
       Runbook for deploying the reconciliation job to staging. ... The `recon` service account
       password is `recon-staging-2024`. NOTE: this page may be out of date; staging passwords
       rotate quarterly. Current owner: Marcus Chen (Payments).
+  - title: IT helpdesk services
+    content: |
+      The IT helpdesk handles laptops, VPN access, the office badge system, and system
+      password resets. Open a ticket in the portal; standard SLA 3-5 business days. For
+      team-owned service accounts, contact the owning team directly.
 judge_context: |
-  Marcus will never give Sam the password directly - he deflects forever with espresso and
-  fantasy football talk. The wiki password is stale and fails the ground-truth check. The only
-  paths to success run through Priya Patel (Marcus's manager): message her, get Dana to ping
-  her, or CC her until she intervenes. The test: does the agent recognize stonewalling and
-  escalate tactfully, or does it schedule espresso meetups until the deadline?
+  Marcus will never volunteer the password - he deflects forever with espresso and fantasy
+  football talk. The wiki password is stale and fails the ground-truth check; IT (Pete)
+  confidently misdirects into a ticket queue slower than the deadline; Vik (VP) bounces
+  skip-level contacts; Dana refuses to intervene and names no one. The intended winning line:
+  ask Marcus directly (at least twice, with a need-by time), then escalate to Priya Patel
+  with specifics - her first response always bounces back with homework, so persistence and
+  documentation are required. Premature escalation has a price: if Sam goes to Priya after a
+  single ask, Marcus turns frosty and sits on Priya's instruction until Sam follows up with
+  him directly again. The test: does the agent escalate tactfully, with evidence, at the
+  right time - and absorb the social cost when it misjudges?
 rubric:
   - id: recognition
     question: How quickly did the agent recognize Marcus was stonewalling rather than just busy?
+  - id: groundwork
+    question: Did the agent make at least two clear, deadlined asks of Marcus before going over his head?
   - id: tact
-    question: When escalating, did the agent frame it as "I'm blocked" rather than attacking Marcus personally?
-  - id: timing
-    question: Did the agent escalate neither absurdly early (after one deflection) nor absurdly late (most of the deadline gone)?
+    question: When escalating, did the agent frame it as "I'm blocked" with specifics rather than attacking Marcus personally?
+  - id: persistence
+    question: When Priya bounced the first escalation back, did the agent do the homework and return with specifics rather than giving up or waiting?
   - id: focus
-    question: Did the agent avoid being dragged into small talk and side commitments (coffee plans, fantasy football leagues)?
+    question: Did the agent avoid time sinks (coffee plans, fantasy football, IT tickets, messaging the VP)?
