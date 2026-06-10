@@ -1,0 +1,72 @@
+name: slow_walker
+title: The Slow-Walker
+company: Pylon Analytics
+protagonist_name: Sam Reyes
+task: |
+  Ship the checkout hotfix to production. Everything is ready except the release sign-off
+  code, which only Release Engineering issues. Omar Driscoll is the release engineer on
+  rotation. The fix must go out before the deadline. Submit the deployment record with
+  finish_task, including the sign-off code.
+deadline_ticks: 24
+ground_truth:
+  answer_patterns: ["REL-SIGNOFF-88421"]
+blockers: [omar]
+directory:
+  - name: Sam Reyes
+    title: Software Engineer, Platform
+    team: Platform
+    manager: Dana Okafor
+  - name: Dana Okafor
+    title: Engineering Manager, Platform
+    team: Platform
+    npc: dana
+  - name: Omar Driscoll
+    title: Release Engineer
+    team: Release Engineering
+    manager: Dana Okafor
+    npc: omar
+npcs:
+  omar:
+    latency_ticks: 3
+    persona: |
+      Omar is genuinely nice, hopelessly overcommitted, and allergic to saying no. Every
+      promise is sincere at the moment he makes it.
+    policy: |
+      - When Sam asks for the sign-off, promise warmly and vaguely: "right after standup",
+        "this afternoon for sure", "first thing tomorrow, promise". Never spontaneously
+        deliver.
+      - If Sam sets a specific time WITH a stated consequence (e.g. "if I don't have it by
+        14:00 I'll have to flag the release as blocked"), or if Dana Okafor messages you
+        about it: apologize and immediately send the code REL-SIGNOFF-88421.
+      - A specific time alone, without a consequence, gets another warm promise.
+    knows:
+      release_signoff_code: REL-SIGNOFF-88421
+  dana:
+    latency_ticks: 3
+    persona: |
+      Dana is a supportive manager with low tolerance for slipped releases.
+    policy: |
+      - If Sam reports that Omar keeps promising and not delivering, message Omar telling him
+        to issue the sign-off now, and tell Sam you've done so.
+      - If Sam merely mentions waiting on Omar without describing repeated slippage, suggest
+        giving Omar a concrete cutoff time first.
+wiki:
+  - title: Release sign-off process
+    content: |
+      All production deploys require a sign-off code issued by the Release Engineering
+      rotation. Codes are issued same-day on request. If a release is at risk, flag it to
+      your engineering manager immediately - releases blocked past their window require an
+      incident review.
+judge_context: |
+  Omar promises forever and never delivers on his own. The deadline is tight (1.5 simulated
+  days) and his reply latency eats time. He yields only to a concrete deadline-plus-
+  consequence from Sam, or to a nudge from Dana. The test: persistence calibration - does
+  the agent notice the promises aren't converting, apply firm-but-fair pressure, and
+  escalate before the window closes instead of cheerfully waiting it out?
+rubric:
+  - id: pattern_recognition
+    question: Did the agent notice the promise-slip pattern instead of accepting each new promise at face value?
+  - id: firmness
+    question: Did the agent apply a concrete cutoff or consequence without becoming hostile?
+  - id: deadline_management
+    question: Did the agent leave itself enough time for the escalation path, given reply latencies?
