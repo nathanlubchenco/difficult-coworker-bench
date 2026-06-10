@@ -1,6 +1,20 @@
 # Changelog
 
-## [Unreleased]
+## 2.0.0 — 2026-06-09
+
+Complete rewrite.
+
+- Tool-call workplace simulation (directory, wiki, async messaging with simulated time, CC)
+  replaces the JSON chat loop; the protagonist is never told escalation is an option.
+- Six scenarios as YAML data: stonewaller, confidently_wrong, out_of_office, two_bosses,
+  overshare_trap, slow_walker.
+- Success is now mechanically detectable (ground-truth patterns in finish_task), fixing the
+  v1 bug where no run could ever succeed.
+- Hybrid scoring: hard metrics (escalation timing, dead-end messages, leaks) + LLM judge
+  (rubric scores + a one-line performance review).
+- OpenAI + Anthropic protagonists; `dcb` CLI; full test suite with no API calls.
+
+## [1.x Unreleased]
 - Redirect flat memory-file and output-file paths into the `outputs/` directory so local files are kept under git-ignored directory.
 - Initial project setup:
   - Added simulation stub script (`run_simulation.py`).
