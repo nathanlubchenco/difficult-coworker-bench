@@ -1,0 +1,19 @@
+[project]
+name = "difficult-coworker-bench"
+version = "2.0.0"
+description = "A benchmark for organizational common sense: can a model figure out when and how to escalate?"
+requires-python = ">=3.10"
+dependencies = ["openai>=1.40", "anthropic>=0.34", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+dcb = "difficult_coworker_bench.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
