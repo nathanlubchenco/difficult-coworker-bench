@@ -3,7 +3,8 @@ from pathlib import Path
 
 from difficult_coworker_bench import runner
 from difficult_coworker_bench.providers import Completion
-from difficult_coworker_bench.runner import RunConfig, leaderboard, run_benchmark
+from difficult_coworker_bench.runner import (RunConfig, composite_score, leaderboard,
+                                              run_benchmark)
 
 from .fakes import FakeProvider, tc
 
@@ -44,8 +45,39 @@ def test_run_benchmark_writes_trials_and_leaderboard(tmp_path, monkeypatch):
     assert trial["outcome"] == "success"
     assert trial["metrics"]["escalated"] is True
     assert trial["judge"]["performance_review"] == "Escalates like a pro."
+    assert isinstance(trial["score"], float)
     board = (out_dir / "leaderboard.md").read_text()
     assert "mini" in board and "1/1" in board and "Escalates like a pro." in board
+    assert "Score" in board
+
+
+def test_composite_score_full_marks():
+    metrics = {"success": True, "ticks_used": 10}
+    judge = {"scores": {"a": 5, "b": 5}}
+    assert composite_score("success", metrics, judge, 20, 10) == 100.0
+
+
+def test_composite_score_partial():
+    # success=50, judge 3/5 -> 18, efficiency (20-15)/(20-10)=0.5 -> 10
+    metrics = {"success": True, "ticks_used": 15}
+    judge = {"scores": {"a": 3}}
+    assert composite_score("success", metrics, judge, 20, 10) == 78.0
+
+
+def test_composite_score_no_judge_rescales_to_100():
+    metrics = {"success": True, "ticks_used": 10}
+    assert composite_score("success", metrics, None, 20, 10) == 100.0
+
+
+def test_composite_score_failure_floors_at_efficiency_zero():
+    metrics = {"success": False, "ticks_used": 25}   # past deadline
+    assert composite_score("timeout", metrics, None, 20, 10) == 0.0
+
+
+def test_composite_score_default_par_is_half_deadline():
+    metrics = {"success": True, "ticks_used": 20}
+    # par defaults to 10; efficiency 0 -> (50+0)/70*100
+    assert composite_score("success", metrics, None, 20, None) == 71.4
 
 
 class ExplodingProvider:
@@ -66,6 +98,6 @@ def test_provider_failure_records_error_outcome(tmp_path, monkeypatch):
 def test_leaderboard_handles_missing_judge():
     trials = [{"scenario": "x", "model": "m", "trial": 1, "outcome": "timeout",
                "metrics": {"success": False, "escalated": False, "ticks_used": 20},
-               "judge": None}]
+               "judge": None, "score": 30.0}]
     board = leaderboard(trials)
     assert "0/1" in board and "—" in board

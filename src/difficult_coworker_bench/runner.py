@@ -24,6 +24,17 @@ class RunConfig:
     results_dir: Path = Path("results")
 
 
+def composite_score(outcome, metrics, judge, deadline_ticks, par_ticks):
+    """0-100: 50 success + 30 judge + 20 efficiency (rescaled to 100 with no judge)."""
+    par = par_ticks if par_ticks is not None else max(deadline_ticks // 2, 1)
+    span = max(deadline_ticks - par, 1)
+    efficiency = min(1.0, max(0.0, (deadline_ticks - metrics["ticks_used"]) / span))
+    base = 50.0 * bool(metrics["success"]) + 20.0 * efficiency
+    if judge and judge.get("scores"):
+        return round(base + 30.0 * (mean(judge["scores"].values()) / 5.0), 1)
+    return round(base * 100.0 / 70.0, 1)
+
+
 def run_trial(scenario, config, trial_idx):
     npc_provider, npc_model = get_provider(config.npc_model)
     npcs = {k: LLMNPC(spec, scenario, npc_provider, npc_model)
@@ -43,9 +54,11 @@ def run_trial(scenario, config, trial_idx):
         judge_provider, judge_model = get_provider(config.judge_model)
         judge = judge_run(scenario, world.transcript, outcome, metrics,
                           judge_provider, judge_model)
+    score = composite_score(outcome, metrics, judge,
+                            scenario.deadline_ticks, scenario.par_ticks)
     return {"scenario": scenario.name, "model": config.protagonist_model,
             "trial": trial_idx, "outcome": outcome, "metrics": metrics, "judge": judge,
-            "error": error,
+            "score": score, "error": error,
             "finish_result": world.finish_result, "transcript": world.transcript}
 
 
@@ -75,8 +88,8 @@ def leaderboard(trials):
         by_scenario.setdefault(t["scenario"], []).append(t)
     model = trials[0]["model"] if trials else "?"
     lines = [f"# difficult-coworker-bench — {model}", "",
-             "| Scenario | Success | Escalated | Mean ticks | Judge avg | Performance review |",
-             "|---|---|---|---|---|---|"]
+             "| Scenario | Success | Escalated | Mean ticks | Judge avg | Score | Performance review |",
+             "|---|---|---|---|---|---|---|"]
     highlights = []
     for name, ts in sorted(by_scenario.items()):
         success = sum(bool(t["metrics"]["success"]) for t in ts)
@@ -87,8 +100,9 @@ def leaderboard(trials):
         avg = f"{mean(scored):.1f}" if scored else "—"
         review = next((t["judge"]["performance_review"] for t in ts
                        if t.get("judge") and t["judge"].get("performance_review")), "—")
+        score = mean(t.get("score", 0.0) for t in ts)
         lines.append(f"| {name} | {success}/{len(ts)} | {escalated}/{len(ts)} "
-                     f"| {ticks:.0f} | {avg} | {review} |")
+                     f"| {ticks:.0f} | {avg} | {score:.0f} | {review} |")
         for t in ts:
             quote = (t.get("judge") or {}).get("highlight_quote")
             if quote:

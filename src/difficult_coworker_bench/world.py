@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass, field
 
 TICKS_PER_DAY = 16  # an 8-hour workday; one tick = 30 simulated minutes
-MAX_NPC_MESSAGES = 30  # safety valve against NPC<->NPC loops
+MAX_NPC_MESSAGES = 60  # safety valve against NPC<->NPC loops; bounces add legit traffic
 
 
 @dataclass
