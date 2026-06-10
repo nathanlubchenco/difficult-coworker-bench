@@ -1,4 +1,3 @@
-"""
-Package for difficult-coworker-bench simulation code.
-"""
-__version__ = "0.1.0"
+"""difficult-coworker-bench: a benchmark for organizational common sense."""
+
+__version__ = "2.0.0"

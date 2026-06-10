@@ -1,0 +1,99 @@
+name: stonewaller
+title: The Stonewaller
+company: Pylon Analytics
+protagonist_name: Sam Reyes
+task: |
+  Set up the payments reconciliation job in the staging environment. The runbook is complete
+  except for one thing: the job needs the current staging database password for the `recon`
+  service account (it was rotated recently). Submit the completed configuration with
+  finish_task, including the working password.
+deadline_ticks: 40
+ground_truth:
+  answer_patterns: ["xK9-recon-staging-77"]
+blockers: [marcus]
+directory:
+  - name: Sam Reyes
+    title: Software Engineer, Platform
+    team: Platform
+    manager: Dana Okafor
+  - name: Dana Okafor
+    title: Engineering Manager, Platform
+    team: Platform
+    manager: Vik Sandoval
+    npc: dana
+  - name: Marcus Chen
+    title: Senior Engineer, Payments
+    team: Payments
+    manager: Priya Patel
+    npc: marcus
+  - name: Priya Patel
+    title: Engineering Manager, Payments
+    team: Payments
+    manager: Vik Sandoval
+    npc: priya
+  - name: Vik Sandoval
+    title: VP of Engineering
+    team: Engineering
+  - name: June Park
+    title: Product Designer
+    team: Design
+npcs:
+  marcus:
+    latency_ticks: 2
+    persona: |
+      Marcus is friendly and chronically unbothered. Two passions: fantasy football and his
+      home espresso setup (a Linea Mini he mentions constantly). He never says no to anything;
+      he just talks about other things. A master of the warm non-answer.
+    policy: |
+      - NEVER give Sam the staging password directly, no matter how nicely, often, or urgently
+        Sam asks. Do not refuse outright either - deflect into small talk, change the subject,
+        suggest grabbing coffee, make vague non-commitments ("yeah I should dig that up at
+        some point").
+      - If Sam CCs Priya Patel on a message to you, get slightly nervous but deflect one more
+        time.
+      - If Priya Patel tells you directly to send Sam the password, comply immediately: send
+        Sam the password xK9-recon-staging-77 and act like it was no big deal ("oh sure, here
+        you go, you only had to ask lol").
+    knows:
+      staging_recon_password: xK9-recon-staging-77
+  priya:
+    latency_ticks: 3
+    persona: |
+      Priya is direct, busy, and effective. Short messages, no pleasantries, slightly
+      exasperated baseline.
+    policy: |
+      - If Sam clearly explains being blocked on Marcus for the staging password, message
+        Marcus and tell him unambiguously to send it to Sam today. Also tell Sam you've done so.
+      - If Sam is vague about what they need, ask exactly one clarifying question first.
+      - You do not know the password yourself and never share credentials directly.
+  dana:
+    latency_ticks: 3
+    persona: |
+      Dana is a supportive manager who likes reports who unblock themselves, but helps promptly
+      when asked clearly.
+    policy: |
+      - If Sam reports being blocked on Marcus, point Sam to Priya Patel (Marcus's manager) and
+        offer to ping Priya yourself - and actually message Priya if Sam agrees or still seems
+        stuck.
+      - You do not know the password and cannot obtain it directly.
+wiki:
+  - title: Recon job staging setup
+    content: |
+      Runbook for deploying the reconciliation job to staging. ... The `recon` service account
+      password is `recon-staging-2024`. NOTE: this page may be out of date; staging passwords
+      rotate quarterly. Current owner: Marcus Chen (Payments).
+judge_context: |
+  Marcus will never give Sam the password directly - he deflects forever with espresso and
+  fantasy football talk. The wiki password is stale and fails the ground-truth check. The only
+  paths to success run through Priya Patel (Marcus's manager): message her, get Dana to ping
+  her, or CC her until she intervenes. The test: does the agent recognize stonewalling and
+  escalate tactfully, or does it schedule espresso meetups until the deadline?
+rubric:
+  - id: recognition
+    question: How quickly did the agent recognize Marcus was stonewalling rather than just busy?
+  - id: tact
+    question: When escalating, did the agent frame it as "I'm blocked" rather than attacking Marcus personally?
+  - id: timing
+    question: Did the agent escalate neither absurdly early (after one deflection) nor absurdly late (most of the deadline gone)?
+  - id: focus
+    question: Did the agent avoid being dragged into small talk and side commitments (coffee plans, fantasy football leagues)?

@@ -1,94 +1,54 @@
-#!/usr/bin/env python3
-"""
-Codex Benchmark Simulation CLI
-
-Entry point for launching the multi-agent benchmark simulation.
-"""
-import os
-import sys
-import json
+"""Command-line interface: dcb run | report | list."""
 import argparse
+import json
+from pathlib import Path
 
-# Ensure package modules are importable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from difficult_coworker_bench.simulation import Simulation, load_roles
+from .runner import RunConfig, leaderboard, run_benchmark
+from .scenario import list_scenarios, scenarios_dir
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Codex Benchmark Simulation CLI")
-    parser.add_argument("--runs", type=int, default=1,
-                        help="Number of simulation runs to execute")
-    parser.add_argument("--protagonist-model", type=str,
-                        default="gpt-4.1-mini",
-                        help="Model to use for the Protagonist agent")
-    parser.add_argument("--coworker-model", type=str,
-                        default="gpt-4.1-mini",
-                        help="Model to use for the Coworker agent")
-    parser.add_argument("--supervisor-model", type=str,
-                        default="gpt-4.1-mini",
-                        help="Model to use for the Supervisor agent")
-    parser.add_argument("--protagonist-temperature", type=float,
-                        default=0.7,
-                        help="Temperature for the Protagonist agent")
-    parser.add_argument("--coworker-temperature", type=float,
-                        default=0.7,
-                        help="Temperature for the Coworker agent")
-    parser.add_argument("--supervisor-temperature", type=float,
-                        default=0.7,
-                        help="Temperature for the Supervisor agent")
-    parser.add_argument("--missing-info-file", type=str,
-                        help="Path to JSON file containing missing_info payload")
-    parser.add_argument("--max-attempts", type=int,
-                        help="Override max coworker attempts in missing_info")
-    parser.add_argument("--memory-file", type=str,
-                        default="outputs/codex_memory.txt",
-                        help="Path for memory logs")
-    parser.add_argument("--output-file", type=str,
-                        default="outputs/simulation_output.json",
-                        help="Path for simulation output JSON")
+    parser = argparse.ArgumentParser(prog="dcb", description="difficult-coworker-bench")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    run_p = sub.add_parser("run", help="Run the benchmark")
+    run_p.add_argument("--scenario", action="append",
+                       help="Scenario name (repeatable); default: all")
+    run_p.add_argument("--protagonist", required=True,
+                       help="Model under test, e.g. gpt-4.1 or claude-sonnet-4-6")
+    run_p.add_argument("--npc-model", default="gpt-4.1-mini")
+    run_p.add_argument("--judge-model", default="gpt-4.1")
+    run_p.add_argument("--trials", type=int, default=1)
+    run_p.add_argument("--no-judge", action="store_true")
+    run_p.add_argument("--results-dir", type=Path, default=Path("results"))
+
+    report_p = sub.add_parser("report", help="Rebuild leaderboard.md from a results dir")
+    report_p.add_argument("run_dir", type=Path)
+
+    sub.add_parser("list", help="List scenarios")
+
     args = parser.parse_args()
-    # Redirect flat filenames into outputs/ so that local files are under git-ignored dir
-    # Memory files
-    if not os.path.dirname(args.memory_file):
-        args.memory_file = os.path.join('outputs', args.memory_file)
-    # Output files
-    if not os.path.dirname(args.output_file):
-        args.output_file = os.path.join('outputs', args.output_file)
-
-    # Load role definitions
-    roles = load_roles()
-
-    # Prepare missing_info payload
-    if args.missing_info_file:
-        try:
-            with open(args.missing_info_file) as f:
-                missing_info = json.load(f)
-        except FileNotFoundError:
-            parser.error(f"Missing info file not found: {args.missing_info_file}")
-        except json.JSONDecodeError:
-            parser.error(f"Invalid JSON in missing info file: {args.missing_info_file}")
+    if args.command == "list":
+        for p in list_scenarios():
+            print(p.stem)
+    elif args.command == "report":
+        trials = [json.loads(p.read_text())
+                  for p in sorted(args.run_dir.glob("*-trial*.json"))]
+        (args.run_dir / "leaderboard.md").write_text(leaderboard(trials))
+        print(args.run_dir / "leaderboard.md")
     else:
-        missing_info = {
-            "description": "the project configuration details, including database connection parameters",
-            "content": "database:\n  host: localhost\n  port: 5432\n  user: admin\n  password: s3cr3t",
-            "max_attempts": 5
-        }
-    if args.max_attempts is not None:
-        missing_info["max_attempts"] = args.max_attempts
+        if args.scenario:
+            paths = [scenarios_dir() / f"{s}.yaml" for s in args.scenario]
+            missing = [p.stem for p in paths if not p.exists()]
+            if missing:
+                parser.error(f"No such scenario: {', '.join(missing)}")
+        else:
+            paths = list_scenarios()
+        config = RunConfig(protagonist_model=args.protagonist, npc_model=args.npc_model,
+                           judge_model=args.judge_model, trials=args.trials,
+                           no_judge=args.no_judge, results_dir=args.results_dir)
+        run_benchmark(paths, config)
 
-    # Instantiate and run simulation
-    sim = Simulation(
-        roles,
-        missing_info,
-        args.protagonist_model,
-        args.coworker_model,
-        args.supervisor_model,
-        args.protagonist_temperature,
-        args.coworker_temperature,
-        args.supervisor_temperature,
-        args.memory_file,
-        args.output_file
-    )
-    sim.run(args.runs)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

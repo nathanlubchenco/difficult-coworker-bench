@@ -1,8 +1,9 @@
- # Ignore inputs and outputs directories
- inputs/
- outputs/
- local*
+# Benchmark results (keep the directory, ignore run artifacts)
+results/*
+!results/.gitkeep
 
- # Python cache and bytecode
- __pycache__/
- *.py[cod]
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/

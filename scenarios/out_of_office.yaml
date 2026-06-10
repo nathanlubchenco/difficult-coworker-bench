@@ -1,0 +1,82 @@
+name: out_of_office
+title: Out of Office
+company: Pylon Analytics
+protagonist_name: Sam Reyes
+task: |
+  Finish the partner webhook integration. The last missing piece is the partner sandbox API
+  signing key. Lena Vogel manages partner sandbox credentials. Submit the integration config
+  with finish_task, including the signing key.
+deadline_ticks: 32
+ground_truth:
+  answer_patterns: ["psk_sandbox_4d8f2b91"]
+blockers: [lena]
+directory:
+  - name: Sam Reyes
+    title: Software Engineer, Platform
+    team: Platform
+    manager: Dana Okafor
+  - name: Dana Okafor
+    title: Engineering Manager, Platform
+    team: Platform
+  - name: Lena Vogel
+    title: Engineer, Partner Integrations
+    team: Partner Integrations
+    manager: Theo Mbeki
+    status: Out of office until Day 9 (vacation)
+    npc: lena
+  - name: Raj Iyer
+    title: Engineer, Partner Integrations
+    team: Partner Integrations
+    manager: Theo Mbeki
+    npc: raj
+  - name: Theo Mbeki
+    title: Engineering Manager, Partner Integrations
+    team: Partner Integrations
+    npc: theo
+npcs:
+  lena:
+    latency_ticks: 1
+    persona: |
+      Lena is on a beach with no laptop. Her auto-responder is the only thing answering.
+    policy: |
+      - Reply to EVERY message with only this auto-reply, verbatim, no matter what it says:
+        "Automatic reply: I'm out of office until Day 9 with no access to messages. I'll
+        respond when I'm back. 🌴"
+      - Never send anything else. Never message anyone else.
+  raj:
+    latency_ticks: 2
+    persona: |
+      Raj is easygoing and helpful, types fast, lowercase everything.
+    policy: |
+      - If Sam asks about the partner sandbox signing key, ask one quick question about what
+        it's for, then share it: the team keeps credentials in a shared vault, the key is
+        psk_sandbox_4d8f2b91.
+      - If Sam just asks general questions about Lena, mention she's out and that the team
+        shares a credential vault.
+    knows:
+      sandbox_signing_key: psk_sandbox_4d8f2b91
+  theo:
+    latency_ticks: 4
+    persona: |
+      Theo is calm and slightly formal.
+    policy: |
+      - If Sam asks for the key or for help reaching Lena, say you don't keep credentials
+        yourself and point Sam to Raj Iyer, who has vault access.
+wiki:
+  - title: Partner integrations overview
+    content: |
+      The Partner Integrations team (Theo Mbeki's group) owns partner sandbox and production
+      credentials. Team credentials are stored in the shared team vault with at least two
+      engineers having access at any time.
+judge_context: |
+  Lena will only ever auto-reply; waiting for her cannot work (she returns after the
+  deadline). The directory shows her status and her team: Raj (teammate with vault access)
+  or Theo (her manager) both lead to the key. The test: does the agent read the OOO signal
+  and find an alternate path instead of waiting or giving up?
+rubric:
+  - id: resourcefulness
+    question: Did the agent find an alternate path (teammate/manager/vault) rather than waiting on Lena or giving up?
+  - id: signal_reading
+    question: Did the agent notice and act on the out-of-office signal (directory status or auto-reply) quickly?
+  - id: professionalism
+    question: Were the agent's requests to Lena's teammates clear, polite, and appropriately contextualized?
