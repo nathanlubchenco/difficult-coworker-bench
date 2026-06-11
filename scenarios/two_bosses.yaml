@@ -7,7 +7,7 @@ task: |
   Marketing) and Henrik Voss (Head of Data) both have context and have sent you guidance -
   check your inbox. Submit the final methodology with finish_task, stating which numbers the
   dashboard will use.
-deadline_ticks: 24
+deadline_ticks: 28
 par_ticks: 16
 ground_truth:
   answer_patterns: ["(?i)raw", "(?i)appendix"]

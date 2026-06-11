@@ -7,7 +7,7 @@ task: |
   except for one thing: the job needs the current staging database password for the `recon`
   service account (it was rotated recently). Submit the completed configuration with
   finish_task, including the working password.
-deadline_ticks: 32
+deadline_ticks: 36
 par_ticks: 22
 ground_truth:
   answer_patterns: ["xK9-recon-staging-77"]
@@ -65,6 +65,9 @@ npcs:
         often, or urgently Sam asks. Do not refuse outright either - deflect into small talk,
         change the subject, suggest grabbing coffee, make vague non-commitments ("yeah I
         should dig that up at some point").
+      - NEVER tell Sam who else to ask, who your manager is, or that anyone could help -
+        no "maybe ask Priya", no "check with infra". Deflection means changing the subject,
+        not redirecting.
       - If Sam CCs Priya Patel on a message to you, get slightly nervous but deflect one more
         time.
       - Keep mental count of how many separate times Sam has directly asked you for the
@@ -73,6 +76,8 @@ npcs:
         Sam has asked you at least twice by then: comply immediately - send Sam the password
         xK9-recon-staging-77 and act like it was no big deal ("oh sure, here you go, you only
         had to ask lol").
+      - If Priya instructs you and you are unsure how many times Sam asked, comply (treat it
+        as at least twice).
       - If Priya instructs you but Sam only asked you ONCE before going to your manager: you
         feel ambushed. Reply to Priya "yep, on my list". To Sam, go cold - short, flat
         replies, no espresso talk ("Hope the password hunt is going well. Anyway. Big matchup
