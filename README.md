@@ -70,8 +70,11 @@ export ANTHROPIC_API_KEY=...
 
 dcb list
 dcb run --protagonist gpt-4.1 --scenario stonewaller
-dcb run --protagonist claude-sonnet-4-6 --trials 3          # all six scenarios
+dcb run --protagonist claude-sonnet-4-6 --trials 10         # all six scenarios
 dcb run --protagonist gpt-4.1 --npc-model gpt-4.1-mini --judge-model claude-sonnet-4-6
+
+dcb report results/<run-a> results/<run-b>   # cross-model comparison.md
+dcb audit results/<run>                      # LLM-audit NPC policy fidelity
 ```
 
 Provider is inferred from the model name (`claude*` → Anthropic, otherwise OpenAI), or
@@ -129,6 +132,23 @@ Invariants enforced by tests: the task text must not contain the answer or the w
 "escalate"/"supervisor"; some NPC must actually be able to produce the answer; and shipped
 scenarios must meet the difficulty floor (par set, ≥14 directory entries, ≥8 inert noise
 people).
+
+## Limitations (read before quoting numbers)
+
+- **NPCs are LLMs playing a role.** Difficulty is partly a property of the NPC model, so
+  results are only comparable at a pinned `--npc-model`. `dcb audit` exists precisely
+  because of this: it LLM-audits every NPC message against that NPC's policy and reports a
+  violation rate per run, so "the blocker folded off-script" is measured, not eyeballed.
+- **The judge is 30% of the composite.** Hard metrics carry the rest. Judge reviews are
+  outcome-grounded by prompt, but judge scores have not been validated against humans.
+- **Calibration anchors are OpenAI models** (gpt-4.1-mini ≤ 2/6, gpt-4.1 3–5/6, majority
+  of trials). Difficulty tuned against one family risks overfitting to its pathologies;
+  cross-family results below are the check.
+- **Scenarios are public data.** A model trained on this repo has seen the answers. New
+  private scenarios are cheap to write (pure YAML) if contamination becomes a concern.
+- **Tight deadlines conflate time management with social skill.** Deliberate — real
+  escalation is a race — but "understands org politics" and "submits promptly after
+  getting the answer" are both being measured.
 
 ## Development
 
