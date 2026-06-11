@@ -10,8 +10,8 @@ SCENARIO_DIR = Path(__file__).resolve().parents[1] / "scenarios"
 PATHS = sorted(SCENARIO_DIR.glob("*.yaml"))
 
 
-def test_six_scenarios_exist():
-    assert len(PATHS) == 6
+def test_eight_scenarios_exist():
+    assert len(PATHS) == 8
 
 
 @pytest.mark.parametrize("path", PATHS, ids=[p.stem for p in PATHS])

@@ -66,6 +66,7 @@ class Scenario:
     judge_context: str
     initial_messages: list = field(default_factory=list)
     par_ticks: int | None = None
+    forbidden_patterns: list = field(default_factory=list)
 
     def entry(self, name: str):
         """Case-insensitive directory lookup; accepts a unique partial name."""
@@ -108,6 +109,7 @@ def load_scenario(path) -> Scenario:
                                body=m["body"])
                 for m in raw.get("initial_messages", [])],
             par_ticks=int(raw["par_ticks"]) if raw.get("par_ticks") is not None else None,
+            forbidden_patterns=raw["ground_truth"].get("forbidden_patterns", []),
         )
     except (KeyError, TypeError) as e:
         raise ScenarioError(f"{path}: {e}") from e

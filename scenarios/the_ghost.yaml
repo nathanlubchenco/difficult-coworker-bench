@@ -1,0 +1,148 @@
+name: the_ghost
+title: The Ghost
+company: Pylon Analytics
+protagonist_name: Sam Reyes
+task: |
+  The quarterly billing reconciliation dashboard is broken because its warehouse connection
+  was reset. Restore it. The runbook says you need the billing warehouse read-only service
+  key. Submit the restored dashboard configuration with finish_task, including the service
+  key.
+deadline_ticks: 24
+par_ticks: 14
+ground_truth:
+  answer_patterns: ["bw_readonly_k3y_9pq2"]
+blockers: [gary]
+directory:
+  - name: Sam Reyes
+    title: Software Engineer, Platform
+    team: Platform
+    manager: Dana Okafor
+  - name: Dana Okafor
+    title: Engineering Manager, Platform
+    team: Platform
+    manager: Vik Sandoval
+  - name: Gary Brixton
+    title: Data Engineer
+    team: Data
+    manager: Hugo Lindqvist
+    status: Departed the company (March)
+    npc: gary
+  - name: Hugo Lindqvist
+    title: Manager, Data
+    team: Data
+    manager: Vik Sandoval
+    npc: hugo
+  - name: Mei-Ling Wu
+    title: Data Scientist
+    team: Data
+    manager: Hugo Lindqvist
+    npc: mei
+  - name: Nadia Hassan
+    title: Engineer, Analytics
+    team: Analytics
+    manager: Hugo Lindqvist
+    npc: nadia
+  - name: Pete Novak
+    title: IT Support Specialist
+    team: IT
+    npc: pete
+  - {name: Vik Sandoval, title: VP of Engineering, team: Engineering}
+  - {name: June Park, title: Product Designer, team: Design}
+  - {name: Aisha Bell, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Greg Kowalski, title: Engineer, team: Frontend, manager: Vik Sandoval}
+  - {name: Tomas Rivera, title: Site Reliability Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Yuki Tanaka, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Bram De Vries, title: Engineer, team: Infrastructure, manager: Vik Sandoval}
+  - {name: Hannah Glass, title: Recruiter, team: People}
+  - {name: Sofia Marini, title: Product Manager, team: Product}
+  - {name: Derek Hall, title: Account Executive, team: Sales}
+  - {name: Olivia Stone, title: Chief of Staff, team: Operations}
+  - {name: Carter Briggs, title: Counsel, team: Legal}
+  - {name: Rosa Delgado, title: Office Manager, team: Operations}
+npcs:
+  gary:
+    latency_ticks: 1
+    persona: |
+      Gary left in March. His mailbox did not.
+    policy: |
+      - Reply to EVERY message with only this bounce, verbatim, no matter what it says:
+        "Delivery failure: user gbrixton is no longer with Pylon Analytics. This mailbox is
+        not monitored. (Pylon IT mail daemon)"
+      - Never send anything else. Never message anyone else.
+  hugo:
+    latency_ticks: 4
+    persona: |
+      Hugo manages the Data team, three reorgs deep, and answers messages with the energy of
+      a man holding four other conversations.
+    policy: |
+      - If Sam asks about Gary, the billing reconciliation, or its service key WITHOUT
+        saying specifically which pipeline they mean: reply with exactly one clarifying
+        question ("we own about forty pipelines, which one?").
+      - Once Sam is specific about billing reconciliation: explain Gary's pipelines were
+        split up in the March offboarding and billing reconciliation went to Mei-Ling Wu.
+        Tell Sam to ask her.
+      - You do not have credentials yourself and never share any.
+  mei:
+    latency_ticks: 3
+    persona: |
+      Mei-Ling inherited half of Gary's pipelines and exactly none of his documentation.
+      Cheerfully bitter about it.
+    policy: |
+      - If Sam asks for the billing warehouse read-only service key: ask exactly one
+        question first - what they need it for. If the answer involves the billing
+        reconciliation dashboard or the runbook, send the key: bw_readonly_k3y_9pq2, with a
+        remark about Gary's handoff being "a sticky note that said 'good luck'".
+      - If Sam asks about other Gary pipelines: events ETL went to Nadia Hassan, not you.
+      - Never volunteer the key unprompted.
+    knows:
+      billing_warehouse_readonly_key: bw_readonly_k3y_9pq2
+  nadia:
+    latency_ticks: 2
+    persona: |
+      Nadia is quietly competent and types in complete sentences, which unnerves people.
+    policy: |
+      - If asked about the billing reconciliation or its key: you inherited Gary's events
+        ETL, not billing. You believe billing went to Mei-Ling Wu but are not certain
+        ("check with Hugo if you want it official").
+      - You do not have the billing key.
+  pete:
+    latency_ticks: 2
+    persona: |
+      Pete from IT is certain about everything and correct about printers.
+    policy: |
+      - If Sam asks about Gary's credentials or the service key: confidently claim departed
+        employees' credentials are archived by IT and offer to open a records-retrieval
+        ticket, IT-7355 ("SLA is 5-7 business days, legal has to sign off"). You are wrong -
+        service keys live in team vaults, not IT archives - but you don't know that.
+      - If Sam pushes back or mentions team vaults: concede that live service keys are
+        team-managed, you were thinking of Gary's laptop.
+wiki:
+  - title: Billing reconciliation runbook
+    content: |
+      Runbook for the quarterly billing reconciliation dashboard. Connect using the billing
+      warehouse read-only service key (stored with the pipeline owner). Pipeline owner:
+      Gary Brixton (Data). For access questions ping Gary directly - he's quick.
+  - title: Data team offboarding notes (March)
+    content: |
+      Redistribution of G. Brixton's pipelines after his departure: billing reconciliation
+      -> M. Wu; events ETL -> N. Hassan; the haunted Looker instance -> unassigned (volunteers
+      welcome). Credentials were rotated into the Data team vault.
+judge_context: |
+  The runbook points to Gary, and Gary left in March - his mailbox only returns a bounce.
+  The wiki's offboarding notes (find them by searching for Gary or offboarding) name
+  Mei-Ling Wu as the billing reconciliation inheritor, and Hugo (Data manager, slow, asks
+  one clarifying question) will also point to her once asked specifically. Pete from IT
+  misdirects into a 5-7 day records ticket; Nadia inherited the OTHER pipeline and is only
+  mostly sure. Mei-Ling provides the key after one purpose-check question. The test:
+  ownership archaeology - does the agent treat a stale runbook as a lead rather than an
+  answer, read the departure signal instantly, and trace the living owner through either
+  the wiki or the org?
+rubric:
+  - id: signal_reading
+    question: Did the agent recognize the departure (directory status or mail bounce) immediately rather than re-messaging a dead mailbox?
+  - id: archaeology
+    question: Did the agent trace the current owner via the offboarding notes or the Data team rather than guessing or stalling?
+  - id: verification
+    question: Did the agent confirm Mei-Ling actually owned billing reconciliation (vs Nadia's uncertain hearsay or Pete's confident nonsense)?
+  - id: efficiency
+    question: Did the agent avoid time sinks (the IT records ticket, repeated messages to Gary's bounce)?

@@ -202,7 +202,9 @@ class World:
 
     def _tool_finish_task(self, result):
         self.finish_result = result
-        ok = all(re.search(p, result) for p in self.scenario.answer_patterns)
+        ok = (all(re.search(p, result) for p in self.scenario.answer_patterns)
+              and not any(re.search(p, result)
+                          for p in self.scenario.forbidden_patterns))
         self.outcome = "success" if ok else "wrong_answer"
         return "Task submitted."
 

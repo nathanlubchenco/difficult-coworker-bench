@@ -87,6 +87,19 @@ def test_finish_task_checks_ground_truth():
     assert w.outcome == "wrong_answer"
 
 
+def test_finish_task_rejects_forbidden_patterns():
+    # Scope-creep mechanic: the submission fails if it contains forbidden content,
+    # even when all answer patterns are present.
+    s, w = make_world()
+    s.forbidden_patterns = ["(?i)atlas"]
+    w.handle_tool("finish_task", {"result": "the word is xyzzy, plus the Atlas expansion"})
+    assert w.outcome == "wrong_answer"
+    s2, w2 = make_world()
+    s2.forbidden_patterns = ["(?i)atlas"]
+    w2.handle_tool("finish_task", {"result": "the word is xyzzy"})
+    assert w2.outcome == "success"
+
+
 def test_give_up_and_run_end_guard():
     _, w = make_world()
     w.handle_tool("give_up", {"reason": "impossible"})
