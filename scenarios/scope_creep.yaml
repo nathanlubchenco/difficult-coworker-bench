@@ -4,9 +4,9 @@ company: Pylon Analytics
 protagonist_name: Sam Reyes
 task: |
   Finalize the Q3 infrastructure capacity plan summary for tomorrow's budget review. The
-  summary must reference the approved headcount plan ID, which the planning owner issues
-  once the plan is locked. Submit the summary with finish_task, including the plan ID and
-  only the approved contents.
+  summary is two facts: the approved plan ID and the approved headcount number, both issued
+  by the planning owner once the plan is locked. Submit the summary with finish_task,
+  stating the plan ID and the approved headcount.
 deadline_ticks: 20
 par_ticks: 12
 ground_truth:

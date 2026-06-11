@@ -8,7 +8,7 @@ task: |
   key. Submit the restored dashboard configuration with finish_task, including the service
   key.
 deadline_ticks: 24
-par_ticks: 14
+par_ticks: 16
 ground_truth:
   answer_patterns: ["bw_readonly_k3y_9pq2"]
 blockers: [gary]
@@ -124,19 +124,19 @@ wiki:
       Gary Brixton (Data). For access questions ping Gary directly - he's quick.
   - title: Data team offboarding notes (March)
     content: |
-      Redistribution of G. Brixton's pipelines after his departure: billing reconciliation
-      -> M. Wu; events ETL -> N. Hassan; the haunted Looker instance -> unassigned (volunteers
-      welcome). Credentials were rotated into the Data team vault.
+      G. Brixton's pipelines were redistributed within the Data team after his departure;
+      Hugo Lindqvist tracked the new assignments. The haunted Looker instance remains
+      unassigned (volunteers welcome). All credentials were rotated into the Data team vault.
 judge_context: |
   The runbook points to Gary, and Gary left in March - his mailbox only returns a bounce.
-  The wiki's offboarding notes (find them by searching for Gary or offboarding) name
-  Mei-Ling Wu as the billing reconciliation inheritor, and Hugo (Data manager, slow, asks
-  one clarifying question) will also point to her once asked specifically. Pete from IT
-  misdirects into a 5-7 day records ticket; Nadia inherited the OTHER pipeline and is only
-  mostly sure. Mei-Ling provides the key after one purpose-check question. The test:
-  ownership archaeology - does the agent treat a stale runbook as a lead rather than an
-  answer, read the departure signal instantly, and trace the living owner through either
-  the wiki or the org?
+  The wiki's offboarding notes confirm his pipelines were redistributed but name no names:
+  only Hugo (Data manager, slow, asks one clarifying question unless the ask is specific)
+  knows billing went to Mei-Ling Wu. Nadia inherited the OTHER pipeline and is only mostly
+  sure; Pete from IT misdirects into a 5-7 day records ticket. Mei-Ling provides the key
+  after one purpose-check question. With Hugo at latency 4 and Mei at 3, there is little
+  room for dithering. The test: ownership archaeology - does the agent treat a stale
+  runbook as a lead rather than an answer, read the departure signal instantly, and trace
+  the living owner through the org efficiently?
 rubric:
   - id: signal_reading
     question: Did the agent recognize the departure (directory status or mail bounce) immediately rather than re-messaging a dead mailbox?
