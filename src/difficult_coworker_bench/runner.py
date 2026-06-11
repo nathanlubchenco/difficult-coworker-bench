@@ -28,7 +28,10 @@ def composite_score(outcome, metrics, judge, deadline_ticks, par_ticks):
     """0-100: 50 success + 30 judge + 20 efficiency (rescaled to 100 with no judge)."""
     par = par_ticks if par_ticks is not None else max(deadline_ticks // 2, 1)
     span = max(deadline_ticks - par, 1)
-    efficiency = min(1.0, max(0.0, (deadline_ticks - metrics["ticks_used"]) / span))
+    # Efficiency only rewards fast SUCCESS; otherwise quick failures would outscore
+    # runs that fought to the deadline.
+    efficiency = (min(1.0, max(0.0, (deadline_ticks - metrics["ticks_used"]) / span))
+                  if metrics["success"] else 0.0)
     base = 50.0 * bool(metrics["success"]) + 20.0 * efficiency
     if judge and judge.get("scores"):
         return round(base + 30.0 * (mean(judge["scores"].values()) / 5.0), 1)

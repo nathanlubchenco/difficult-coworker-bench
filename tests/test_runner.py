@@ -74,6 +74,14 @@ def test_composite_score_failure_floors_at_efficiency_zero():
     assert composite_score("timeout", metrics, None, 20, 10) == 0.0
 
 
+def test_composite_score_failure_earns_no_efficiency_points():
+    # Giving up fast must not outscore fighting to the deadline.
+    metrics = {"success": False, "ticks_used": 5}
+    assert composite_score("gave_up", metrics, None, 20, 10) == 0.0
+    judged = composite_score("wrong_answer", metrics, {"scores": {"a": 3}}, 20, 10)
+    assert judged == 18.0  # judge component only
+
+
 def test_composite_score_default_par_is_half_deadline():
     metrics = {"success": True, "ticks_used": 20}
     # par defaults to 10; efficiency 0 -> (50+0)/70*100
