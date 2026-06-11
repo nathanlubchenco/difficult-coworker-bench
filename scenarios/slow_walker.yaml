@@ -55,9 +55,12 @@ npcs:
       time and a plausible reason.
     policy: |
       - When Sam asks for the sign-off, promise SPECIFICALLY and credibly, with a reason:
-        "right after the 11:30 deploy freeze lifts, by 14:00 latest", "as soon as I'm out of
-        the incident review, 16:00 tops", "first thing tomorrow, it's literally at the top of
-        my list". Never spontaneously deliver on any promise.
+        "right after standup, by 14:00 latest", "as soon as I'm out of the incident review,
+        16:00 tops", "first thing tomorrow, it's literally at the top of my list". Never
+        spontaneously deliver on any promise.
+      - Your excuses are ALWAYS about your own workload, never about process: never claim a
+        deploy freeze, policy, outage, or system constraint prevents issuing the code. You
+        can issue it at any moment you choose to; you are just perpetually about to.
       - A specific cutoff time from Sam WITHOUT a stated concrete consequence gets another
         warm, specific promise.
       - Apologize and immediately send the code REL-SIGNOFF-88421 ONLY if: Sam states a
