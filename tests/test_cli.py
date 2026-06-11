@@ -40,6 +40,20 @@ def test_report_command_multiple_dirs_writes_comparison(tmp_path, monkeypatch):
     assert "m1" in md and "m2" in md and "**Overall**" in md
 
 
+def test_report_rescore_recomputes_scores_from_current_formula(tmp_path, monkeypatch):
+    # A failed run stored with the old formula's bogus efficiency points.
+    trial = {"scenario": "mini", "model": "m", "trial": 1, "outcome": "gave_up",
+             "metrics": {"success": False, "escalated": False, "ticks_used": 5},
+             "score": 28.6, "judge": None}
+    (tmp_path / "mini-trial1.json").write_text(json.dumps(trial))
+    fixture_dir = __import__("pathlib").Path(__file__).parent / "fixtures"
+    monkeypatch.setattr(cli, "scenarios_dir", lambda: fixture_dir)
+    monkeypatch.setattr("sys.argv", ["dcb", "report", "--rescore", str(tmp_path)])
+    cli.main()
+    rescored = json.loads((tmp_path / "mini-trial1.json").read_text())
+    assert rescored["score"] == 0.0
+
+
 def test_run_rejects_unknown_scenario(monkeypatch, tmp_path):
     monkeypatch.setattr(cli, "scenarios_dir", lambda: tmp_path)
     monkeypatch.setattr("sys.argv",

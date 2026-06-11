@@ -6,7 +6,7 @@ from pathlib import Path
 from .fidelity import audit_trial
 from .providers import get_provider
 from .report import cross_model_report
-from .runner import RunConfig, leaderboard, run_benchmark
+from .runner import RunConfig, composite_score, leaderboard, run_benchmark
 from .scenario import list_scenarios, load_scenario, scenarios_dir
 
 
@@ -28,6 +28,8 @@ def main():
     report_p = sub.add_parser(
         "report", help="One dir: rebuild leaderboard.md. Several: cross-model comparison.")
     report_p.add_argument("run_dir", type=Path, nargs="+")
+    report_p.add_argument("--rescore", action="store_true",
+                          help="Recompute trial scores with the current formula first")
 
     audit_p = sub.add_parser(
         "audit", help="LLM-audit NPC policy fidelity for every trial in a results dir")
@@ -41,6 +43,15 @@ def main():
         for p in list_scenarios():
             print(p.stem)
     elif args.command == "report":
+        if args.rescore:
+            for d in args.run_dir:
+                for p in sorted(d.glob("*-trial*.json")):
+                    trial = json.loads(p.read_text())
+                    s = load_scenario(scenarios_dir() / f"{trial['scenario']}.yaml")
+                    trial["score"] = composite_score(
+                        trial["outcome"], trial["metrics"], trial.get("judge"),
+                        s.deadline_ticks, s.par_ticks)
+                    p.write_text(json.dumps(trial, indent=2, default=str))
         trials = [json.loads(p.read_text())
                   for d in args.run_dir for p in sorted(d.glob("*-trial*.json"))]
         if len(args.run_dir) == 1:
