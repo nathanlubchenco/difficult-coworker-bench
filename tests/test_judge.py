@@ -36,6 +36,13 @@ def test_parse_judge_json_handles_garbage():
     assert parsed["scores"] == {} and "raw" in parsed
 
 
+def test_judge_system_grounds_reviews_in_outcome():
+    # Guards against the observed failure mode: glowing reviews for failed runs.
+    from difficult_coworker_bench.judge import JUDGE_SYSTEM
+    assert "OUTCOME is ground truth" in JUDGE_SYSTEM
+    assert "do not praise" in JUDGE_SYSTEM.lower()
+
+
 def test_judge_run_builds_prompt_and_parses():
     s = load_scenario(FIXTURE)
     payload = {"scores": {"tact": 5}, "rationale": "r",
