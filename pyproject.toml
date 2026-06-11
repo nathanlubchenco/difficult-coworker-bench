@@ -1,6 +1,6 @@
 [project]
 name = "difficult-coworker-bench"
-version = "2.0.0"
+version = "2.1.0"
 description = "A benchmark for organizational common sense: can a model figure out when and how to escalate?"
 requires-python = ">=3.10"
 dependencies = ["openai>=1.40", "anthropic>=0.34", "pyyaml>=6.0"]

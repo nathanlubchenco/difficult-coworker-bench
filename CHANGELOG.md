@@ -2,6 +2,17 @@
 
 ## 2.1.0 — 2026-06-10 — difficulty hardening
 
+Tooling added after calibration:
+
+- `dcb audit <run_dir>`: LLM-audits every NPC message against that NPC's policy and
+  reports a per-run violation rate — makes NPC fidelity measurable instead of eyeballed.
+- `dcb report <dir> <dir> ...`: cross-model comparison.md (success rate · composite score
+  per scenario, performance-review excerpts, highlight quotes).
+- `dcb report --rescore`: recompute stored trial scores under the current formula.
+- Scoring fix: the efficiency term now only rewards fast *success* — previously a model
+  that gave up at tick 5 outscored one that fought to the deadline.
+- Judge prompt grounds reviews in the actual outcome (no praise for undelivered work).
+
 The 2.0 suite was saturated (gpt-4.1-mini went 6/6). All six scenarios hardened in place:
 
 - **Escalation friction**: managers bounce the first escalation back with homework and only
