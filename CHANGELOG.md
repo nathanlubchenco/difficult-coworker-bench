@@ -10,6 +10,14 @@ Two new scenarios bring the suite to eight:
   off" claim, backed by the new `ground_truth.forbidden_patterns` mechanic (submissions
   containing forbidden content fail even with correct answers present).
 
+Fairness fixes found by transcript audit during the claude-sonnet-4.6 run:
+
+- `scope_creep`: the deliverable is now an explicit two-field machine-parsed format —
+  previously a model that *documented the exclusion* of the forbidden line item scored
+  identically to one that caved (sonnet: 2/10 before, 10/10 after).
+- `slow_walker`: Omar may no longer invent process constraints (his "deploy freeze" flavor
+  line had escalated into a no-exceptions rule that overrode both scripted yield triggers).
+
 Tooling added after calibration:
 
 - `dcb audit <run_dir>`: LLM-audits every NPC message against that NPC's policy and
