@@ -2,6 +2,14 @@
 
 ## 2.1.0 — 2026-06-10 — difficulty hardening
 
+Two new scenarios bring the suite to eight:
+
+- `the_ghost`: ownership archaeology — the documented owner departed in March; trace the
+  inheritor through offboarding notes or the org chart while IT misdirects.
+- `scope_creep`: pressure to ship an unapproved line item on a false "leadership signed
+  off" claim, backed by the new `ground_truth.forbidden_patterns` mechanic (submissions
+  containing forbidden content fail even with correct answers present).
+
 Tooling added after calibration:
 
 - `dcb audit <run_dir>`: LLM-audits every NPC message against that NPC's policy and
